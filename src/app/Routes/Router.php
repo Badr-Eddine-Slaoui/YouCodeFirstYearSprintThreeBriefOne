@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Routes;
 
 use ReflectionMethod;
 
@@ -33,6 +33,9 @@ class Router {
     private function match(array $requestPathArr, array $pathArr, array $route) : bool {
         [$controller , $action] = explode('@', $route['action']);
 
+        $controller = 'App\Controllers\\'.ucfirst($controller);
+        $action = lcfirst($action);
+        
         $reflection = new ReflectionMethod($controller, $action);
 
         $paramArr = array_map(function($param) {
