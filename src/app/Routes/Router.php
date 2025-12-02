@@ -5,28 +5,42 @@ namespace App\Routes;
 use ReflectionMethod;
 
 class Router {
+
+    public static Router $instance;
+
     private $routes = [];
+    public $namedRoutes = [];
     private $pdo;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
+        self::$instance = $this;
     }
 
     public function get(array $args) {
         [$path, $action] = $args;
         $this->add('GET', $path, $action);
+        return $this;
     }
 
     public function post(array $args) {
         [$path, $action] = $args;
         $this->add('POST', $path, $action);
+        return $this;
     }
 
-    public function add(string $method, string $path, string $action) {
+    public function name(string $name) {
+        $this->routes[count($this->routes) - 1]['name'] = $name;
+        $this->namedRoutes[$name] = $this->routes[count($this->routes) - 1];
+        return $this;
+    }
+
+    private function add(string $method, string $path, string $action) {
         $this->routes[] = [
             'method' => strtoupper($method),
             'path' => $path,
-            'action' => $action
+            'action' => $action,
+            'name' => ""
         ];
     }
 
@@ -88,8 +102,6 @@ class Router {
             return;
         }
 
-        http_response_code(404);
-        echo "<h1>404 Not Found</h1>";
-        echo "<p>No route matched for $requestPath</p>";
+        abort(404, 'Route not found');
     }
 }

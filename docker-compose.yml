@@ -3,6 +3,7 @@ services:
   php:
     build: .
     container_name: novacraft_php
+    user: "${UID}:${GID}"
     volumes:
       - "${LOCAL_PATH}:/var/www/html"
     environment:

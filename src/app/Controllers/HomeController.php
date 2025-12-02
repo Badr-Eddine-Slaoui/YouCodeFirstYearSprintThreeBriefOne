@@ -4,18 +4,18 @@ namespace App\Controllers;
 
 class HomeController extends Controller {
     public function index() {
-        $this->view('index');
+        view('index');
     }
 
     public function services() {
-        $this->view('services');
+        view('services');
     }
 
     public function about() {
-        $this->view('about');
+        view('about');
     }
 
     public function contact() {
-        $this->view('contact');
+        view('contact');
     }
 }
