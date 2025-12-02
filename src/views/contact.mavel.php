@@ -1,5 +1,5 @@
 @layout('templates.layout')
-<section class="container mx-auto py-16">
+<section class="mx-auto py-16">
   <h2 class="text-3xl font-bold mb-6 text-center">Contactez-nous</h2>
   <form class="max-w-xl mx-auto bg-white p-8 shadow-md rounded-lg space-y-4">
     <input type="text" placeholder="Votre nom" class="w-full border px-4 py-2 rounded-lg">
