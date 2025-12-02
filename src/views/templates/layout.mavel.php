@@ -11,7 +11,9 @@
 <body class="bg-gray-50 text-gray-800">
 
     @view('templates.header')
-    @yield('content')
+    <div class="w-screen h-screen">
+        @yield('content')
+    </div>
     @view('templates.footer')
     
 </body>

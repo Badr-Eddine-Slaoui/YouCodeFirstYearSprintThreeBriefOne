@@ -2,6 +2,10 @@
 
 use App\Routes\Router;
 
+define('CACHE_DIR', __DIR__.'/../cache');
+define('VIEWS_DIR', __DIR__.'/../views');
+define('BASE_VIEWS_DIR', __DIR__.'/../app/views');
+
 function parseMavel(string $content) {
     $content = preg_replace(
         "/@view\(['\"](.+?)['\"]\)/",
@@ -35,13 +39,13 @@ function view(string $view, array $data = []): void {
         extract($data);
 
         $view = str_replace('.', '/', $view);
-        $file = __DIR__.'/../views/'.$view.'.mavel.php';
+        $file = VIEWS_DIR . "/$view.mavel.php";
 
         if (!file_exists($file)) {
             abort(404, 'View not found');
         }
 
-        $dir = __DIR__.'/../cache/views';
+        $dir = CACHE_DIR . "/views";
         
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
@@ -73,7 +77,7 @@ function view(string $view, array $data = []): void {
         include_once "$dir/" . md5($view) . ".php";
         
     } catch (Exception $e) {
-        echo $e->getMessage();
+        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
         exit();
     }
 }
@@ -109,7 +113,7 @@ function route(string $name, array $params = []): string {
         return $path;
 
     } catch (Exception $e) {
-        echo $e->getMessage();
+        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
         exit();
     }
 }
@@ -119,7 +123,7 @@ function redirect(string $name, array $params = []): never {
         header('Location: ' . route($name, $params));
         exit();
     }catch(Exception $e){
-        echo $e->getMessage();
+        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
         exit();
     }
 }
@@ -127,23 +131,21 @@ function redirect(string $name, array $params = []): never {
 function abort(int $code, string $message): never {
     try {
         http_response_code($code);
-        echo $message;
+        require_once  BASE_VIEWS_DIR . "/Errors/abort.php";
         exit();
     } catch (Exception $e) {
-        echo $e->getMessage();
+        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
         exit();
     }
 }
 
 function dd(mixed ...$var): never {
     try {
-        echo '<pre>';
-        var_dump(...$var);
-        echo '</pre>';
-        die();
+        require_once  BASE_VIEWS_DIR . "/Exceptions/dd.php";
+        exit();
     } catch (Exception $e) {
-        echo $e->getMessage();
-        die();
+        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
+        exit();
     }
 }
 
@@ -155,7 +157,7 @@ function page(): string {
         $page = str_replace('.mavel.php', '', $page);
         return $page;
     }catch(Exception $e){
-        echo $e->getMessage();
+        require_once  BASE_VIEWS_DIR . "/Exceptions/exception.php";
         exit();
     }
 }
