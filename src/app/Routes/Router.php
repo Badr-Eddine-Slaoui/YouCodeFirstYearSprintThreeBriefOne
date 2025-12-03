@@ -2,6 +2,8 @@
 
 namespace App\Routes;
 
+use App\DB\Database;
+use PDO;
 use ReflectionMethod;
 
 class Router {
@@ -10,10 +12,10 @@ class Router {
 
     private $routes = [];
     public $namedRoutes = [];
-    private $pdo;
+    private $db;
 
-    public function __construct($pdo) {
-        $this->pdo = $pdo;
+    public function __construct(Database $db) {
+        $this->db = $db;
         self::$instance = $this;
     }
 
@@ -81,8 +83,8 @@ class Router {
             }
         }
 
-        $controller = new $controller($this->pdo);
-        $controller->$action(...$params);
+        global $container;
+        $container->call([$controller, $action], $params);
 
         return true;
     }
