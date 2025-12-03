@@ -35,6 +35,16 @@ function parseMavel(string $content) {
     return $content;
 }
 
+
+function app(): Container {
+    return $GLOBALS['app'];
+}
+
+function show_error_view(Exception $e): never {
+    require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
+    exit();
+}
+
 function view(string $view, array $data = []): void {
     try {
         extract($data);

@@ -6,9 +6,6 @@ use App\Request\Request;
 
 class HomeController extends Controller {
     public function index(Request $request) {
-        echo '<pre>';
-        var_dump($request->all());
-        echo '</pre>';
         view('index');
     }
 
