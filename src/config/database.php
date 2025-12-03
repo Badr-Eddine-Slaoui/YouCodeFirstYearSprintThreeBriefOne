@@ -6,5 +6,5 @@ $pass = getenv('POSTGRES_PASSWORD');
 $dbname = getenv('POSTGRES_DB');
 
 if (!$host || !$user || !$pass || !$dbname) {
-    die("Missing environment variables");
+    abort(500, 'Missing environment variables');
 }
