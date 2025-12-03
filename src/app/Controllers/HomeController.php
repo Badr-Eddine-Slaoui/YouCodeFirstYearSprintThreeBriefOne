@@ -2,20 +2,25 @@
 
 namespace App\Controllers;
 
+use App\Request\Request;
+
 class HomeController extends Controller {
-    public function index() {
+    public function index(Request $request) {
+        echo '<pre>';
+        var_dump($request->all());
+        echo '</pre>';
         view('index');
     }
 
-    public function services() {
+    public function services(Request $request) {
         view('services');
     }
 
-    public function about() {
+    public function about(Request $request) {
         view('about');
     }
 
-    public function contact() {
+    public function contact(Request $request) {
         view('contact');
     }
 }

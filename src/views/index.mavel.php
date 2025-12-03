@@ -1,11 +1,3 @@
-<?php
-  $data= [
-    'name' => 'DigitalWave Solutions'
-  ];
-  $view = 'index';
-  dd($view, $data);
-?>
-
 @layout('templates.layout')
 <section class="mx-auto py-20 text-center">
   <h2 class="text-4xl font-bold mb-6">Propulsez votre entreprise vers le digital</h2>

@@ -1,5 +1,6 @@
 <?php
 
+use App\DI\Container;
 use App\Routes\Router;
 
 define('CACHE_DIR', __DIR__.'/../cache');
@@ -32,6 +33,10 @@ function parseMavel(string $content) {
     );
 
     return $content;
+}
+
+function app(): Container {
+    return $GLOBALS['app'];
 }
 
 function view(string $view, array $data = []): void {
@@ -84,7 +89,8 @@ function view(string $view, array $data = []): void {
 
 function route(string $name, array $params = []): string {
     try {
-        $route = Router::$instance->namedRoutes[$name];
+        $router = app()->get(Router::class);
+        $route = $router->namedRoutes[$name];
 
         if (!$route) {
             abort(404, 'Route not found');
