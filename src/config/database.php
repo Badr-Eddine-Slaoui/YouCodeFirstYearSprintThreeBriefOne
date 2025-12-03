@@ -6,12 +6,12 @@ $pass = getenv('POSTGRES_PASSWORD');
 $dbname = getenv('POSTGRES_DB');
 
 if (!$host || !$user || !$pass || !$dbname) {
-    die("Missing environment variables");
+    abort(500, 'Missing environment variables');
 }
 
 try {
     $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    show_error_view($e);
 }
