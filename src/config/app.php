@@ -34,6 +34,11 @@ function parseMavel(string $content) {
     return $content;
 }
 
+function show_error_view(Exception $e): never {
+    require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
+    exit();
+}
+
 function view(string $view, array $data = []): void {
     try {
         extract($data);
@@ -77,8 +82,7 @@ function view(string $view, array $data = []): void {
         include_once "$dir/" . md5($view) . ".php";
         
     } catch (Exception $e) {
-        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
 
@@ -113,8 +117,7 @@ function route(string $name, array $params = []): string {
         return $path;
 
     } catch (Exception $e) {
-        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
 
@@ -123,8 +126,7 @@ function redirect(string $name, array $params = []): never {
         header('Location: ' . route($name, $params));
         exit();
     }catch(Exception $e){
-        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
 
@@ -134,8 +136,7 @@ function abort(int $code, string $message): never {
         require_once  BASE_VIEWS_DIR . "/Errors/abort.php";
         exit();
     } catch (Exception $e) {
-        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
 
@@ -144,8 +145,7 @@ function dd(mixed ...$var): never {
         require_once  BASE_VIEWS_DIR . "/Exceptions/dd.php";
         exit();
     } catch (Exception $e) {
-        require_once BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
 
@@ -157,7 +157,6 @@ function page(): string {
         $page = str_replace('.mavel.php', '', $page);
         return $page;
     }catch(Exception $e){
-        require_once  BASE_VIEWS_DIR . "/Exceptions/exception.php";
-        exit();
+        show_error_view($e);
     }
 }
