@@ -1,11 +1,11 @@
 <?php
 
-use App\DI\Container;
-use App\Routes\Router;
+use Foundations\DI\Container;
+use Foundations\Routes\Router;
 
 define('CACHE_DIR', __DIR__.'/../cache');
 define('VIEWS_DIR', __DIR__.'/../views');
-define('BASE_VIEWS_DIR', __DIR__.'/../app/views');
+define('BASE_VIEWS_DIR', __DIR__.'/../foundations/views');
 
 function parseMavel(string $content) {
     $content = preg_replace(
@@ -42,7 +42,7 @@ function parseMavel(string $content) {
 }
 
 function asset($path) {
-    return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/public/' . ltrim($path, '/');
+    return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($path, '/');
 }
 
 function app(): Container {

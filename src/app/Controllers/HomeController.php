@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Request\Request;
+use Foundations\Controllers\Controller;
+use Foundations\Request\Request;
 
 class HomeController extends Controller {
     public function index(Request $request) {

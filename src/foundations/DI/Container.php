@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DI;
+namespace Foundations\DI;
 
 use Exception;
 use ReflectionClass;

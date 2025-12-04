@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace Foundations\Services;
 
-use App\DB\Database;
-use App\DI\Container;
-use App\Routes\Router;
+use Foundations\DB\Database;
+use Foundations\DI\Container;
+use Foundations\Routes\Router;
 
 class AppServiceProvider {
 

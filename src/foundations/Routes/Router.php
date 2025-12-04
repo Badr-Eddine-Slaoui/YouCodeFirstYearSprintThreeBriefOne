@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Routes;
+namespace Foundations\Routes;
 
-use App\DB\Database;
-use PDO;
+use Foundations\DB\Database;
 use ReflectionMethod;
 
 class Router {

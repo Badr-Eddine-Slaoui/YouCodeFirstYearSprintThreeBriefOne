@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Request;
+namespace Foundations\Request;
 
 class Request {
     public function uri() {
