@@ -32,9 +32,18 @@ function parseMavel(string $content) {
         $content
     );
 
+    $content = preg_replace(
+        "/@asset\(['\"](.+?)['\"]\)/",
+        "<?php echo asset('$1'); ?>",
+        $content
+    );
+
     return $content;
 }
 
+function asset($path) {
+    return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/public/' . ltrim($path, '/');
+}
 
 function app(): Container {
     return $GLOBALS['app'];
