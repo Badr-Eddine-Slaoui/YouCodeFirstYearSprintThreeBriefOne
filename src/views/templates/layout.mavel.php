@@ -12,11 +12,10 @@
 <body class="bg-white text-gray-800">
 
     @view('templates.header')
-    <div class="w-full h-screen">
+    <div class="w-full min-h-screen">
         @yield('content')
     </div>
     @view('templates.footer')
-    
 </body>
 
 </html>
