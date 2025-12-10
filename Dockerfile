@@ -29,3 +29,5 @@ WORKDIR /var/www/html
 RUN mkdir -p /var/www/html/cache/views \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html
+
+RUN npm i && composer install && composer dump-autoload
