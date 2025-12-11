@@ -6,6 +6,7 @@ use Foundations\DB\Migrations\Migrator;
 
 define('ROOT_DIR', __DIR__ .'/../../..');
 define('APP_DIR', __DIR__ .'/../../../app');
+define('DATABASE_DIR', __DIR__ .'/../../../database');
 
 class Mavel {
     private $argv = [];
@@ -61,6 +62,16 @@ class Mavel {
 
                 break;
             }
+            case "build/migration":{
+                $name = $this->getName("migration");
+
+                $this->validateMigrationName($name);
+
+                $date = date("Y_m_d_His");
+
+                $this->buildMigration($name, $date);
+                break;
+            }
             case "migrate":{
                 Migrator::migrate();
                 break;
@@ -73,7 +84,6 @@ class Mavel {
                 Migrator::rollback();
                 break;
             }
-
             case "migrate/refresh":{
                 $start_time = \microtime(true);
 
@@ -117,6 +127,18 @@ class Mavel {
         }
     }
 
+    private function validateMigrationName(string $name): void {
+        if(!\preg_match('/^[a-zA-Z_]+$/', $name)) {
+            echo "Invalid migration name.\n";
+            exit(1);
+        }
+
+        if(!\preg_match("/^create_[a-zA-Z]+_table$/", $name)) {
+            echo "Migration name must be in this format: 'create_name_table'\n";
+            exit(1);
+        }
+    }
+
     private function displayHelpMenue(): void {
         echo "Usage: mavel <command> <name>\n";
         echo "Commands:\n";
@@ -133,12 +155,22 @@ class Mavel {
         $dirs = [
             "Controller" => [
                 "template"=> __DIR__ . '/../templates/Controller.php',
-                "dir" => APP_DIR . '/Controllers'
+                "dir" => APP_DIR . '/Controllers',
+                "filePath" => "./app/Controllers/$name.php",
+                "name" => $name
             ],
             "ResourceController" => [
                 "template"=> __DIR__ . '/../templates/ResourceController.php',
-                "dir" => APP_DIR . '/Controllers'
-            ]
+                "dir" => APP_DIR . '/Controllers',
+                "filePath" => "./app/Controllers/$name.php",
+                "name"=> $name
+            ],
+            "Migration" => [
+                "template"=> __DIR__ . '/../templates/Migration.php',
+                "dir" => DATABASE_DIR . '/Migrations',
+                "filePath" => "./database/Migrations/$name.php",
+                "name"=> str_replace("create_", "", str_replace("_table", "", $name))
+            ],
         ];
 
         $dir = $dirs[$postfix]['dir'];
@@ -148,7 +180,7 @@ class Mavel {
         \chmod($dir, 0777);
 
         $file = "$dir/$name.php";
-        $filePath = "./app/Controllers/$name.php";
+        $filePath = $dirs[$postfix]["filePath"];
         
         if (\file_exists($file)) {
             echo "$postfix already exists: $filePath\n";
@@ -157,11 +189,43 @@ class Mavel {
 
         $content = \file_get_contents($dirs[$postfix]["template"]);
 
-        $content = \str_replace("{$postfix}Template", $name, $content);
+        $content = \str_replace("{$postfix}Template", $dirs[$postfix]["name"], $content);
 
         \file_put_contents($file, $content);
         \chmod($file, 0777);
 
         echo "$postfix created: $filePath\n";
+    }
+
+    private function buildMigration(string $name, string $date): void {
+
+        $template =  __DIR__ . '/../templates/Migration.php';
+        $dir = DATABASE_DIR . '/Migrations';
+        $filePath = "./database/Migrations/$name.php";
+        $table_name = str_replace("create_", "", str_replace("_table", "", $name));
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $migrations = \glob("$dir/*.php");
+
+        foreach ($migrations as $file) {
+            if(\str_contains($file,"$name")) {
+                echo "Migration already exists: ./database/Migrations/". \basename($file) . "\n";
+                return;
+            }
+        }
+
+        $file = "$dir/{$date}_$name.php";
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("MigrationTable", $table_name, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Migration created: $filePath\n";
     }
 }
