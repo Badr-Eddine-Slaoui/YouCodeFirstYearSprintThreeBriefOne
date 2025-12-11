@@ -2,21 +2,15 @@ services:
 
   php:
     build: .
-    container_name: novacraft_php
-    user: "${UID}:${GID}"
+    container_name: php
     volumes:
       - "${LOCAL_PATH}:/var/www/html"
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - postgres
 
   nginx:
     image: nginx:alpine
-    container_name: novacraft_nginx
+    container_name: nginx
     ports:
       - "${PHP_PORT}:80"
     volumes:
@@ -27,7 +21,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    container_name: novacraft_postgres_db
+    container_name: postgres
     restart: always
     environment:
       POSTGRES_DB: "${POSTGRES_DB}"
@@ -40,7 +34,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: novacraft_pgadmin
+    container_name: pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: "${PGADMIN_EMAIL}"
