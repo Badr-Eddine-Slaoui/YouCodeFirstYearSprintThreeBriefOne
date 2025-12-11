@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+
+<?php
+
+use Foundations\CLI\Bin\Mavel;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+
+$mav = new Mavel();
+$mav->run();
