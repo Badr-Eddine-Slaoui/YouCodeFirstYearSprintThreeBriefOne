@@ -36,4 +36,25 @@ class Mavel {
 
         $this->command = $this->argv[0];
     }
+
+    public function run(): void {
+        switch ($this->command) {
+            case 'help':{
+                $this->displayHelpMenue();
+                break;
+            }
+            default:
+                echo "Command '$this->command' not found. Use 'mavel help' for help.\n";
+                exit(1);
+        }
+    }
+
+    private function displayHelpMenue(): void {
+        echo "Usage: mavel <command> <name>\n";
+        echo "Commands:\n";
+        echo "  help\n";
+        echo "  build/controller\n";
+        echo "      OPTIONS:\n";
+        echo "          -r, --resource\n";
+    }
 }
