@@ -9,10 +9,13 @@ class Database extends PDO
 {
     public function __construct() {
         try{
-            require_once __DIR__ . '/../../config/database.php';
+            
+            require __DIR__ ."/../Helpers/env.php";
+
+            require __DIR__ . '/../../config/database.php';
 
             if (!$driver || !$host || !$port || !$user || !$pass || !$dbname) {
-                abort(500, 'Missing environment variables');
+                echo 'Missing environment variables';
             }
 
             $dsn = '';
@@ -25,7 +28,7 @@ class Database extends PDO
                     $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
                     break;
                 default:
-                    abort(500, 'Invalid database driver');
+                    echo 'Invalid database driver';
                     break;
             }
 
@@ -35,7 +38,7 @@ class Database extends PDO
             $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             
         }catch(PDOException $e){
-            abort(500, $e->getMessage());
+            echo $e->getMessage();
         }
     }
 }
