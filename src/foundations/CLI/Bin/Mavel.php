@@ -43,6 +43,16 @@ class Mavel {
                 $this->displayHelpMenue();
                 break;
             }
+            case 'build/controller':{
+
+                $name = $this->getName("controller");
+
+                $this->validateName($name, 'controller');
+
+                $this->buildFile($name,"Controller");
+
+                break;
+            }
             default:
                 echo "Command '$this->command' not found. Use 'mavel help' for help.\n";
                 exit(1);
