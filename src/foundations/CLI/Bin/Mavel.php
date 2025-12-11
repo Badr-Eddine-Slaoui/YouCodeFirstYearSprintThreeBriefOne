@@ -47,9 +47,15 @@ class Mavel {
 
                 $name = $this->getName("controller");
 
+                $optR = isset($this->options['r']) || isset($this->options['resource']);
+
                 $this->validateName($name, 'controller');
 
-                $this->buildFile($name,"Controller");
+                if ($optR) {
+                    $this->buildFile($name, "ResourceController");
+                } else {
+                    $this->buildFile($name,"Controller");
+                }
 
                 break;
             }
