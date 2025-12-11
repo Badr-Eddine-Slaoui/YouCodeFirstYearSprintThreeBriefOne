@@ -9,30 +9,26 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-
-    <?php view('templates.header'); ?>
     <main>
-  <section class="page-404">
+      <section class="page-404">
 
-    <!-- Background Shapes -->
+        <!-- Background Shapes -->
 
-    <div class="content animate_top">
-      <img src="images/404.svg" alt="404" class="error-img">
+        <div class="content animate_top">
+          <img src="images/404.svg" alt="404" class="error-img">
 
-      <h2>Sorry, the page can’t be found</h2>
-      <p>
-        The page you were looking for appears to have been moved,
-        deleted or does not exist.
-      </p>
-        <div>
-      <a href="./index.html" class="btn-home">Back to Home</a>
-      </div>
-    </div>
+          <h2>Sorry, the page can’t be found</h2>
+          <p>
+            The page you were looking for appears to have been moved,
+            deleted or does not exist.
+          </p>
+            <div>
+          <a href="/" class="btn-home">Back to Home</a>
+          </div>
+        </div>
 
-  </section>
-</main>
-    <?php view('templates.footer'); ?>
-    
+      </section>
+    </main>
 </body>
 
 </html>

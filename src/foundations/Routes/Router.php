@@ -13,8 +13,7 @@ class Router {
     public $namedRoutes = [];
     private $db;
 
-    public function __construct(Database $db) {
-        $this->db = $db;
+    public function __construct() {
         self::$instance = $this;
     }
 
