@@ -2,6 +2,8 @@
 
 namespace Foundations\CLI\Bin;
 
+use Foundations\DB\Migrations\Migrator;
+
 define('ROOT_DIR', __DIR__ .'/../../..');
 define('APP_DIR', __DIR__ .'/../../../app');
 
@@ -57,6 +59,28 @@ class Mavel {
                     $this->buildFile($name,"Controller");
                 }
 
+                break;
+            }
+            case "migrate":{
+                Migrator::migrate();
+                break;
+            }
+            case "migrate/down":{
+                Migrator::down();
+                break;
+            }
+            case "migrate/rollback":{
+                Migrator::rollback();
+                break;
+            }
+
+            case "migrate/refresh":{
+                $start_time = \microtime(true);
+
+                Migrator::down();
+                Migrator::migrate();
+
+                echo "Migrations refreshed in " . \round(\microtime(true) - $start_time,2) . "s\n\n";
                 break;
             }
             default:
