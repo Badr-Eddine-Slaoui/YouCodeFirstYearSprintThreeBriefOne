@@ -86,4 +86,42 @@ class Mavel {
         echo "          -r, --resource\n";
     }
 
+    private function buildFile(string $name, string $postfix): void {
+
+        $postfix = \ucfirst($postfix);
+
+        $dirs = [
+            "Controller" => [
+                "template"=> __DIR__ . '/../templates/Controller.php',
+                "dir" => APP_DIR . '/Controllers'
+            ],
+            "ResourceController" => [
+                "template"=> __DIR__ . '/../templates/ResourceController.php',
+                "dir" => APP_DIR . '/Controllers'
+            ]
+        ];
+
+        $dir = $dirs[$postfix]['dir'];
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $file = "$dir/$name.php";
+        $filePath = "./app/Controllers/$name.php";
+        
+        if (\file_exists($file)) {
+            echo "$postfix already exists: $filePath\n";
+            return;
+        }
+
+        $content = \file_get_contents($dirs[$postfix]["template"]);
+
+        $content = \str_replace("{$postfix}Template", $name, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "$postfix created: $filePath\n";
+    }
 }
