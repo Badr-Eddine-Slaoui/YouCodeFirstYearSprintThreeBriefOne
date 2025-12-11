@@ -49,6 +49,18 @@ class Mavel {
         }
     }
 
+    private function getName(string $postfix): string | null {
+
+        $postfix = \ucfirst($postfix);
+
+        if(\count($this->argv) === 1) {
+            echo "Please provide a $postfix name.\n";
+            exit(1);
+        }
+
+        return $this->argv[1];
+    }
+
     private function displayHelpMenue(): void {
         echo "Usage: mavel <command> <name>\n";
         echo "Commands:\n";
@@ -57,4 +69,5 @@ class Mavel {
         echo "      OPTIONS:\n";
         echo "          -r, --resource\n";
     }
+
 }
