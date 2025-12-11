@@ -61,6 +61,22 @@ class Mavel {
         return $this->argv[1];
     }
 
+    private function validateName(string &$name, string $postfix): void {
+
+        $postfix = \ucfirst($postfix);
+
+        if(!\preg_match('/^[a-zA-Z]+$/', $name)) {
+            echo "Invalid $postfix name.\n";
+            exit(1);
+        }
+        
+        $name = \ucfirst($name);
+
+        if (!\strpos($name, $postfix) && $postfix != "Model") {
+            $name .= $postfix;
+        }
+    }
+
     private function displayHelpMenue(): void {
         echo "Usage: mavel <command> <name>\n";
         echo "Commands:\n";
