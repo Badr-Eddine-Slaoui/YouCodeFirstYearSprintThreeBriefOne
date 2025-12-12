@@ -48,7 +48,7 @@ class PostgresGrammar extends Grammar{
         }
 
         if(isset($column["default"])) {
-            $default = "DEFAULT " . $column["default"];
+            $default = $column["type"] == "string" ? "DEFAULT '{$column["default"]}'" : "DEFAULT {$column["default"]}";
         }
 
         if(isset($column["unique"])) {
