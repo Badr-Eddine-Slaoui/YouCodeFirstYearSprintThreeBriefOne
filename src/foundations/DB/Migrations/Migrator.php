@@ -9,6 +9,10 @@ class Migrator {
         return Migration::getMigrations();
     }
 
+    public static function getColumnStructure(string $table, string $column): string {
+        return Migration::getColumnStructure($table, $column);
+    }
+
     public static function migrate(): void {
         $migrations = glob(MIGRATION_DIR . "*.php");
 
