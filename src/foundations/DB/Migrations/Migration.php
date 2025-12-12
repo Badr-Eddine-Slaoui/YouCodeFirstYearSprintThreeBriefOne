@@ -123,6 +123,118 @@ abstract class Migration {
         $db = null;
     }
 
+    public static function getColumnStructure(string $table, string $column): string {
+
+        $sql = PostgresGrammar::compileColumnExists($table, $column);
+        $db = new Database();
+        $result = $db->query($sql);
+
+        if($result->rowCount() == 0) {
+            $db = null;
+            return '';
+        }
+
+        $sql = PostgresGrammar::checkColumnPrimarySQL($table, $column);
+        $result = $db->query($sql);
+
+        $primary = true;
+        if($result->rowCount() == 0) {
+            $primary = false;
+        }
+
+
+        $sql = PostgresGrammar::getColumnSQL($table, $column);
+        $stmt = $db->query($sql);
+        $result = $stmt->fetch();
+
+        $structure = "\$table->";
+
+        switch($result["data_type"]) {
+            case "integer":{
+                $structure .= "integer('{$result["column_name"]}')->";
+                break;
+            }
+            case "character varying":{
+                $structure .= "string('{$result["column_name"]}')->";
+                break;
+            }
+            case "double precision":{
+                $structure .= "float('{$result["column_name"]}')->";
+                break;
+            }
+            case "boolean":{
+                $structure .= "boolean('{$result["column_name"]}')->";
+                break;
+            }
+            case "date":{
+                $structure .= "date('{$result["column_name"]}')->";
+                break;
+            }
+            case "time without time zone":{
+                $structure .= "time('{$result["column_name"]}')->";
+                break;
+            }
+            case "timestamp without time zone":{
+                $structure .= "timestamp('{$result["column_name"]}')->";
+                break;
+            }
+            case "timestamp with time zone":{
+                $structure .= "timestampTz('{$result["column_name"]}')->";
+                break;
+            }
+            default: {
+                $db = null;
+                return '';
+            }
+        }
+
+        if($result["is_identity"] == "YES") {
+            if($primary) {
+                return "\$table->id('{$result["column_name"]}');";
+            }else{
+                $structure .= "auto_increment()->";
+            }
+        }
+
+        if($result["character_maximum_length"]) {
+            $structure .= "size({$result["character_maximum_length"]})->";
+        }
+
+        if($result["is_nullable"] == "YES") {
+            $structure .= "nullable()->";
+        }
+
+        if($result["column_default"]) {
+            $default = $result["column_default"];
+            if (preg_match("/^'(.*)'::/", $default, $matches)) {
+                $default = $matches[1];
+            }
+            $structure .= "default('{$default}')->";
+        }
+
+        $sql = PostgresGrammar::checkColumnUniqueSQL($table, $column);
+        $result = $db->query($sql);
+
+        $unique = true;
+        if($result->rowCount() == 0) {
+            $unique = false;
+        }
+
+        if($unique) {
+            $structure .= "unique()->";
+        }
+
+        if($primary){
+            $structure .= "primary_key()->";
+        }
+
+        $db = null;
+        
+        $structure = substr($structure, 0, -2) . ";\n";
+
+        return $structure;
+    }
+
     public static function getMigrations(): array {
         $sql = PostgresGrammar::compileTableExists('migrations');
 
