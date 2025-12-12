@@ -151,6 +151,25 @@ class PostgresGrammar extends Grammar{
                 END $$;";
     }
 
+    public static function addColumnsSQL(string $table, array $columns) {
+        $result = "DO $$
+                    BEGIN";
+        foreach($columns as $column) {
+            $sql = self::columnToSQL($column);
+            $sql = str_replace(",","", $sql);
+            $result .= "
+                        IF NOT EXISTS (
+                            SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = '$table' 
+                            AND column_name = '{$column->getName()}'
+                        ) THEN
+                            ALTER TABLE $table ADD COLUMN $sql;
+                        END IF;
+                    ";
+        }
+        return "$result END $$;";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
