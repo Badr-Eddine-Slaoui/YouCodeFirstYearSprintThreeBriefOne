@@ -14,7 +14,7 @@ class Table
 
     public function id(string $name = 'id'): void {
         $column = new Column($name);
-        $column->type('BIGINT')->unsigned()->primary_key()->auto_incriment();
+        $column->type('BIGINT')->unsigned()->primary_key()->auto_increment();
         $this->collumns[] = $column;
     }
 

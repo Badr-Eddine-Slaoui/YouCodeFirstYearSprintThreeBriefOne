@@ -39,7 +39,7 @@ class Column{
         return $this;
     }
 
-    public function auto_incriment() : self {
+    public function auto_increment() : self {
         $this->column["auto_increment"] = true;
         return $this;
     }
