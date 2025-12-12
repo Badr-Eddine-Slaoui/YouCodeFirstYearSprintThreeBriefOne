@@ -136,6 +136,21 @@ class PostgresGrammar extends Grammar{
         return "$sql\n $unique\n $primary_key";
     }
 
+    public static function addColumnSQL(string $table, Column $column) {
+        $sql = self::columnToSQL($column);
+        $sql = str_replace(",","", $sql);
+        return "DO $$
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = '$table' 
+                        AND column_name = '{$column->getName()}'
+                    ) THEN
+                        ALTER TABLE $table ADD COLUMN $sql;
+                    END IF;
+                END $$;";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
