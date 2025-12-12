@@ -233,4 +233,50 @@ class Mavel {
 
         echo "Migration created: $filePath\n";
     }
+
+    private function buildAddColumnMigration(string $name, string $date): void {
+        $template =  __DIR__ . '/../templates/AddColumnMigration.php';
+        $dir = DATABASE_DIR . '/Migrations';
+        $filePath = "./database/Migrations/$name.php";
+        preg_match('/add_(column|columns)_(.*)_to_(.*)_table/', $name, $matches);
+        $columns_str = $matches[2];
+        $table_name = $matches[3];
+
+        $columns = \explode('_and_', $columns_str);
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $migrations = \glob("$dir/*.php");
+
+        foreach ($migrations as $file) {
+            if(\str_contains($file,$name)) {
+                echo "Migration already exists: ./database/Migrations/". \basename($file) . "\n";
+                return;
+            }
+        }
+
+        $file = "$dir/{$date}_$name.php";
+
+        $content = \file_get_contents($template);
+
+        if(\count($columns) > 1) {
+            $content = \str_replace("MigrationTable", $table_name, $content);
+            $content = \str_replace("addColumn", "addColumns", $content);
+            $content = \str_replace("dropColumn", "dropColumns", $content);
+            $content = \str_replace("'column_name'", "['". \implode("', '", $columns). "']", $content); 
+
+        }else{
+            $content = \str_replace("MigrationTable", $table_name, $content);
+            $content = \str_replace("column_name", $columns[0], $content);
+        }
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Migration created: $filePath\n";
+        
+        exit(0);
+    } 
 }
