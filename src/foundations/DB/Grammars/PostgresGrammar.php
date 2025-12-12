@@ -218,6 +218,20 @@ class PostgresGrammar extends Grammar{
         return "$result END $$;";
     }
 
+    public static function getColumnSQL(string $table, string $column) {
+        return "SELECT 
+                    column_name,
+                    data_type,
+                    character_maximum_length,
+                    column_default,
+                    is_nullable,
+                    is_identity, 
+                    identity_generation
+                FROM information_schema.columns
+                WHERE table_name = '$table'
+                AND column_name = '$column';";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
