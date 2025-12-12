@@ -333,4 +333,53 @@ class Mavel {
         
         exit(0);
     } 
+
+    private function buildUpdateColumnMigration(string $name, string $date): void {
+        $template =  __DIR__ . '/../templates/UpdateColumnMigration.php';
+        $dir = DATABASE_DIR . '/Migrations';
+        $filePath = "./database/Migrations/$name.php";
+        preg_match('/update_(column|columns)_(.*)_from_(.*)_table/', $name, $matches);
+        $columns_str = $matches[2];
+        $table_name = $matches[3];
+
+        $columns = \explode('_and_', $columns_str);
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $migrations = \glob("$dir/*.php");
+
+        foreach ($migrations as $file) {
+            if(\str_contains($file,$name)) {
+                echo "Migration already exists: ./database/Migrations/". \basename($file) . "\n";
+                return;
+            }
+        }
+
+        $file = "$dir/{$date}_$name.php";
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("MigrationTable", $table_name, $content);
+
+        if(\count($columns) > 1) {
+            $content = \str_replace("updateColumn", "updateColumns", $content);
+        }
+
+        $structure = "";
+
+        foreach ($columns as $column) {
+            $structure .= Migrator::getColumnStructure($table_name, $column) . "\t\t\t";
+        }
+
+        $content = \str_replace("// Column To Update", $structure, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Migration created: $filePath\n";
+        
+        exit(0);
+    } 
 }
