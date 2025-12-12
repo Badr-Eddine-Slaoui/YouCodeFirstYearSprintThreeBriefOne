@@ -128,13 +128,18 @@ class Mavel {
     }
 
     private function validateMigrationName(string $name): void {
-        if(!\preg_match('/^[a-zA-Z_]+$/', $name)) {
-            echo "Invalid migration name.\n";
-            exit(1);
-        }
+        $sc = "(?!and$)(?!and_)[a-z]+(?:_(?!and$)(?!and_)[a-z]+)*";
 
-        if(!\preg_match("/^create_[a-zA-Z]+_table$/", $name)) {
-            echo "Migration name must be in this format: 'create_name_table'\n";
+        if(
+            !preg_match("/^create_{$sc}_table$/", $name) &&
+            !preg_match("/^add_column_{$sc}_to_{$sc}_table$/", $name) &&
+            !preg_match("/^add_columns_{$sc}(?:_and_{$sc})*_to_{$sc}_table$/", $name) &&
+            !preg_match("/^remove_column_{$sc}_from_{$sc}_table$/", $name) &&
+            !preg_match("/^remove_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name)&&
+            !preg_match("/^update_column_{$sc}_from_{$sc}_table$/", $name) &&
+            !preg_match("/^update_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name)
+        ){
+            echo "Migration name must be in this formats:\n    -'create_name_table'\n    -'add_column_name_to_name_table'\n    -'add_columns_name_and_name_to_name_table'\n    -'remove_column_name_from_name_table'\n    -'remove_columns_name_and_name_from_name_table'\nNote: name can only contain lowecase letters and underscores.\n";
             exit(1);
         }
     }
