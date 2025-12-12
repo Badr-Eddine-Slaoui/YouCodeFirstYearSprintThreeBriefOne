@@ -9,6 +9,10 @@ class Column{
         $this->column["name"] = $name;
     }
 
+    public function getName(): string{
+        return $this->column["name"];
+    }
+
     public function type(string $type): self {
         $this->column["type"] = $type;
         return $this;
