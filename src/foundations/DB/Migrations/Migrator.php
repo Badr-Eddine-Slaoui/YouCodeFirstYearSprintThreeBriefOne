@@ -9,7 +9,7 @@ class Migrator {
         return Migration::getMigrations();
     }
 
-    public static function migrate() {
+    public static function migrate(): void {
         $migrations = glob(MIGRATION_DIR . "*.php");
 
         if(\count($migrations) === 0) {
@@ -49,7 +49,7 @@ class Migrator {
         echo "Migrations completed in ". \round(\microtime(true) - $global_start_time, 2) ."s\n\n";
     }
 
-    public static function down() {
+    public static function down(): void {
         $migrations = array_reverse(glob(MIGRATION_DIR . "*.php"));
 
         if(\count($migrations) === 0) {
@@ -90,7 +90,7 @@ class Migrator {
         echo "Rollback completed in ". \round(\microtime(true) - $global_start_time, 2) ."s\n\n";
     }
 
-    public static function rollback() {
+    public static function rollback(): void {
         
         $migrations = array_reverse(glob(MIGRATION_DIR . "*.php"));
 

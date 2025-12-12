@@ -6,11 +6,11 @@ use Foundations\DB\Database;
 use Foundations\DB\Grammars\PostgresGrammar;
 
 abstract class Migration {
-    abstract public function up();
+    abstract public function up(): void;
     
-    abstract public function down();
+    abstract public function down(): void;
 
-    protected function create(string $name, callable $callback) {
+    protected function create(string $name, callable $callback): void {
         $table = new Table();
         $callback($table);
 
@@ -19,22 +19,28 @@ abstract class Migration {
         $db = new Database();
 
         $db->query($sql);
+
+        $db = null;
     }
 
-    protected function dropIfExists(string $name) {
+    protected function dropIfExists(string $name): void {
         $sql = PostgresGrammar::dropTableIfExistsSQL($name);
 
         $db = new Database();
 
         $db->query($sql);
+
+        $db = null;
     }
 
-    protected function drop(string $name) {
+    protected function drop(string $name): void {
         $sql = PostgresGrammar::dropTableSQL($name);
 
         $db = new Database();
 
         $db->query($sql);
+
+        $db = null;
     }
 
     public static function getMigrations(): array {
@@ -47,36 +53,38 @@ abstract class Migration {
         if($tableExisted->rowCount() == 0) {
             $table = new Table();
             $table->id();
-            $table->string('name')->size(255);
+            $table->string('name')->size(255)->unique();
             $table->timestampTz('created_at')->default("CURRENT_TIMESTAMP");
 
             $sql = PostgresGrammar::createTableSQL('migrations', $table->get_collumns());
 
             $db->query($sql);
 
+            $db = null;
+
             return [];
         }else{
-            $sql = "SELECT * FROM migrations";
+            $sql = PostgresGrammar::getMigrationsSQL();
 
             $migrations = $db->query($sql);
+
+            $db = null;
 
             return $migrations->fetchAll();
         }
     }
 
-    public static function add_migration(string $name) {
-        $sql = "INSERT INTO migrations (name) VALUES (:name)";
+    public static function add_migration(string $name): void {
+        $sql = PostgresGrammar::addMigrationSQL($name);
         $db = new Database();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':name', $name);
-        $stmt->execute();
+        $db->query($sql);
+        $db = null;
     }
 
-    public static function drop_migration(string $name) {
-        $sql = "DELETE FROM migrations WHERE name = :name";
+    public static function drop_migration(string $name): void {
+        $sql = PostgresGrammar::dropMigrationSQL($name);
         $db = new Database();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':name', $name);
-        $stmt->execute();
+        $db->query($sql);
+        $db = null;
     }
 }
