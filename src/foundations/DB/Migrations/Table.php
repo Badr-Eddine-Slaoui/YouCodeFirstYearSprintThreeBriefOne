@@ -55,7 +55,7 @@ class Table
 
     public function dateTime(string $name): Column {
         $column = new Column($name);
-        $column->type('DATETIME');
+        $column->type('TIMESTAMP');
         $this->collumns[] = $column;
         return $column;
     }
