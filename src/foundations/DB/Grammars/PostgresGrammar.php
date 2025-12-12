@@ -182,6 +182,22 @@ class PostgresGrammar extends Grammar{
         return substr($sql, 0, -1) . ";";
     }
 
+    public static function updateColumnSQL(string $table, Column $column) {
+        $sql = self::columnToUpdateSQL($table, $column);
+        
+        return "DO $$
+                BEGIN
+                    IF EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name = '$table'
+                        AND column_name = '{$column->getName()}'
+                    ) THEN
+                        ALTER TABLE $table
+                        $sql
+                    END IF;
+                END $$;";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
