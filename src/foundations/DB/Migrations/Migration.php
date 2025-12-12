@@ -14,7 +14,7 @@ abstract class Migration {
         $table = new Table();
         $callback($table);
 
-        $sql = PostgresGrammar::createTableSQL($name, $table->get_collumns());
+        $sql = PostgresGrammar::createTableSQL($name, $table->get_columns());
 
         $db = new Database();
 
@@ -43,6 +43,22 @@ abstract class Migration {
         $db = null;
     }
 
+    protected function addColumn(string $name, callable $callback): void {
+        $table = new Table();
+
+        $callback($table);
+
+        $column = $table->get_columns()[0];
+
+        $sql = PostgresGrammar::addColumnSQL($name, $column);
+
+        $db = new Database();
+
+        $db->query($sql);
+
+        $db = null;
+    }
+
     public static function getMigrations(): array {
         $sql = PostgresGrammar::compileTableExists('migrations');
 
@@ -56,7 +72,7 @@ abstract class Migration {
             $table->string('name')->size(255)->unique();
             $table->timestampTz('created_at')->default("CURRENT_TIMESTAMP");
 
-            $sql = PostgresGrammar::createTableSQL('migrations', $table->get_collumns());
+            $sql = PostgresGrammar::createTableSQL('migrations', $table->get_columns());
 
             $db->query($sql);
 
