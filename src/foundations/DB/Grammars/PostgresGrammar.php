@@ -174,6 +174,14 @@ class PostgresGrammar extends Grammar{
         return "ALTER TABLE IF EXISTS $table DROP COLUMN IF EXISTS $column;";
     }
 
+    public static function dropColumnsSQL(string $table, array $columns) {
+        $sql = "ALTER TABLE IF EXISTS $table ";
+        foreach($columns as $column) {
+            $sql .= "DROP COLUMN IF EXISTS $column,";
+        }
+        return substr($sql, 0, -1) . ";";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
