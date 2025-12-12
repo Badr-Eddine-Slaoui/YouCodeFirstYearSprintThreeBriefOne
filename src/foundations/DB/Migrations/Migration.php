@@ -109,6 +109,20 @@ abstract class Migration {
         $db = null;
     }
 
+    protected function updateColumns(string $name, callable $callback): void {
+        $table = new Table();
+
+        $callback($table);
+
+        $sql = PostgresGrammar::updateColumnsSQL($name, $table->get_columns());
+
+        $db = new Database();
+
+        $db->query($sql);
+
+        $db = null;
+    }
+
     public static function getMigrations(): array {
         $sql = PostgresGrammar::compileTableExists('migrations');
 
