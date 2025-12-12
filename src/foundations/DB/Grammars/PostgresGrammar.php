@@ -5,20 +5,20 @@ namespace Foundations\DB\Grammars;
 use Foundations\DB\Migrations\Column;
 
 class PostgresGrammar extends Grammar{
-    public static function compileTableExists(string $table) {
+    public static function compileTableExists(string $table): string {
         return "SELECT * FROM information_schema.tables WHERE table_name = '$table'";
     }
 
-    public static function compileColumnExists(string $table, string $column) {
+    public static function compileColumnExists(string $table, string $column): string {
         return "SELECT * FROM information_schema.columns WHERE table_name = '$table' AND column_name = '$column'";
     }
 
-    public static function createTableSQL(string $table, array $columns) {
+    public static function createTableSQL(string $table, array $columns): string {
         $sql = self::compileColumns($columns);
         return "CREATE TABLE IF NOT EXISTS $table ($sql);";
     }
 
-    public static function compileColumns(array $columns) {
+    public static function compileColumns(array $columns): string {
         $sql = "";
         foreach($columns as $column) {
             $sql .= self::columnToSQL($column);
@@ -27,7 +27,7 @@ class PostgresGrammar extends Grammar{
         return $sql;
     }
 
-    public static function columnToSQL(Column $column) {
+    public static function columnToSQL(Column $column): string {
         $column = $column->column;
 
         $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = null;
@@ -72,7 +72,7 @@ class PostgresGrammar extends Grammar{
         return "$name $type $size $default $nullable $unique $auto_increment $primary_key,";
     }
 
-    public static function columnToUpdateSQL(string $table, Column $column) {
+    public static function columnToUpdateSQL(string $table, Column $column): string {
         $column = $column->column;
 
         $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = null;
@@ -136,7 +136,7 @@ class PostgresGrammar extends Grammar{
         return "$sql\n $unique\n $primary_key";
     }
 
-    public static function addColumnSQL(string $table, Column $column) {
+    public static function addColumnSQL(string $table, Column $column): string {
         $sql = self::columnToSQL($column);
         $sql = str_replace(",","", $sql);
         return "DO $$
@@ -151,7 +151,7 @@ class PostgresGrammar extends Grammar{
                 END $$;";
     }
 
-    public static function addColumnsSQL(string $table, array $columns) {
+    public static function addColumnsSQL(string $table, array $columns): string {
         $result = "DO $$
                     BEGIN";
         foreach($columns as $column) {
@@ -170,11 +170,11 @@ class PostgresGrammar extends Grammar{
         return "$result END $$;";
     }
 
-    public static function dropColumnSQL(string $table, string $column) {
+    public static function dropColumnSQL(string $table, string $column): string {
         return "ALTER TABLE IF EXISTS $table DROP COLUMN IF EXISTS $column;";
     }
 
-    public static function dropColumnsSQL(string $table, array $columns) {
+    public static function dropColumnsSQL(string $table, array $columns): string {
         $sql = "ALTER TABLE IF EXISTS $table ";
         foreach($columns as $column) {
             $sql .= "DROP COLUMN IF EXISTS $column,";
@@ -182,7 +182,7 @@ class PostgresGrammar extends Grammar{
         return substr($sql, 0, -1) . ";";
     }
 
-    public static function updateColumnSQL(string $table, Column $column) {
+    public static function updateColumnSQL(string $table, Column $column): string {
         $sql = self::columnToUpdateSQL($table, $column);
         
         return "DO $$
@@ -198,7 +198,7 @@ class PostgresGrammar extends Grammar{
                 END $$;";
     }
 
-    public static function updateColumnsSQL(string $table, array $columns) {
+    public static function updateColumnsSQL(string $table, array $columns): string {
         $result = "DO $$
                     BEGIN";
         foreach($columns as $column) {
@@ -218,7 +218,7 @@ class PostgresGrammar extends Grammar{
         return "$result END $$;";
     }
 
-    public static function getColumnSQL(string $table, string $column) {
+    public static function getColumnSQL(string $table, string $column): string {
         return "SELECT 
                     column_name,
                     data_type,
@@ -232,7 +232,7 @@ class PostgresGrammar extends Grammar{
                 AND column_name = '$column';";
     }
 
-    public static function checkColumnUniqueSQL(string $table, string $column){
+    public static function checkColumnUniqueSQL(string $table, string $column): string{
         return "SELECT tc.constraint_name
                 FROM information_schema.table_constraints tc
                 JOIN information_schema.constraint_column_usage ccu 
@@ -243,7 +243,7 @@ class PostgresGrammar extends Grammar{
                 ";
     }
 
-    public static function checkColumnPrimarySQL(string $table, string $column){
+    public static function checkColumnPrimarySQL(string $table, string $column): string{
         return "SELECT tc.constraint_name
                 FROM information_schema.table_constraints tc
                 JOIN information_schema.constraint_column_usage ccu 
@@ -254,11 +254,11 @@ class PostgresGrammar extends Grammar{
                 ";
     }
 
-    public static function dropTableSQL(string $table) {
+    public static function dropTableSQL(string $table): string {
         return "DROP TABLE $table;";
     }
 
-    public static function dropTableIfExistsSQL(string $table) {
+    public static function dropTableIfExistsSQL(string $table): string {
         return "DROP TABLE IF EXISTS $table;";
     }
 

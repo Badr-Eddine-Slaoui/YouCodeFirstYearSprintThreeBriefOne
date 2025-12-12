@@ -6,7 +6,7 @@ use DateTime;
 
 class Table
 {
-    private $collumns = [];
+    private array $collumns = [];
 
     public function get_columns(): array {
         return $this->collumns;

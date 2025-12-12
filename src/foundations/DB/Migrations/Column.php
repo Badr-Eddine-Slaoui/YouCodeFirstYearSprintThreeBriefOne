@@ -3,7 +3,7 @@
 namespace Foundations\DB\Migrations;
 
 class Column{
-    public $column = [];
+    public array $column = [];
 
     public function __construct(string $name) {
         $this->column["name"] = $name;
