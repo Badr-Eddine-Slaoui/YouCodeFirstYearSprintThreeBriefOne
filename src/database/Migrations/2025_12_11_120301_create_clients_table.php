@@ -6,7 +6,7 @@ use Foundations\DB\Migrations\Migration;
 use Foundations\DB\Migrations\Table;
 
 return new class extends Migration{
-    public function up(){
+    public function up(): void{
         $this->create('clients', function(Table $table){
             $table->id();
             $table->string('name')->size(30);
@@ -16,7 +16,7 @@ return new class extends Migration{
         });
     }
 
-    public function down(){
+    public function down(): void{
         $this->dropIfExists('clients');
     }
 };
