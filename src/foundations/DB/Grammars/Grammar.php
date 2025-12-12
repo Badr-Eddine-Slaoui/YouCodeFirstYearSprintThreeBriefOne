@@ -15,6 +15,26 @@ abstract class Grammar {
 
     abstract public static function columnToSQL(Column $column);
 
+    abstract public static function columnToUpdateSQL(string $table, Column $column);
+
+    abstract public static function addColumnSQL(string $table, Column $column);
+
+    abstract public static function addColumnsSQL(string $table, array $columns);
+
+    abstract public static function dropColumnSQL(string $table, string $column);
+
+    abstract public static function dropColumnsSQL(string $table, array $columns);
+
+    abstract public static function updateColumnSQL(string $table, Column $column);
+
+    abstract public static function updateColumnsSQL(string $table, array $columns);
+
+    abstract public static function getColumnSQL(string $table, string $column);
+
+    abstract public static function checkColumnUniqueSQL(string $table, string $column);
+
+    abstract public static function checkColumnPrimarySQL(string $table, string $column);
+
     abstract public static function dropTableSQL(string $table);
 
     abstract public static function dropTableIfExistsSQL(string $table);
