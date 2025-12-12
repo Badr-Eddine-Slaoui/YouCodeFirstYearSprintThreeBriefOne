@@ -53,6 +53,13 @@ class Table
         return $column;
     }
 
+    public function time(string $name): Column {
+        $column = new Column($name);
+        $column->type('TIME');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
     public function dateTime(string $name): Column {
         $column = new Column($name);
         $column->type('TIMESTAMP');
