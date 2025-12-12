@@ -72,6 +72,70 @@ class PostgresGrammar extends Grammar{
         return "$name $type $size $default $nullable $unique $auto_increment $primary_key,";
     }
 
+    public static function columnToUpdateSQL(string $table, Column $column) {
+        $column = $column->column;
+
+        $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = null;
+
+        if(isset($column["name"])) {
+            $name = $column["name"];
+        }
+
+        $alter_str = "ALTER COLUMN $name";
+
+        if(isset($column["type"])) {
+            if($column["type"] == "string") {
+                if(!isset($column["size"])) {
+                    $column["size"] = 255;
+                }
+                $type = "$alter_str TYPE varchar(" . $column["size"] . "),";
+            }else{
+                $type = "$alter_str TYPE {$column["type"]},";
+            }
+        }
+
+        if(isset($column["default"])) {
+            $default = $column["type"] == "string" ? "DEFAULT '{$column["default"]}'" : "DEFAULT {$column["default"]}";
+            $default = "$alter_str SET $default,";
+        }
+
+        if(isset($column["unique"])) {
+            $unique = "IF NOT EXISTS (
+                            SELECT 1 
+                            FROM information_schema.table_constraints
+                            WHERE table_name='{$table}' 
+                            AND constraint_type='UNIQUE'
+                        ) THEN
+                            EXECUTE 'ALTER TABLE {$table} ADD CONSTRAINT {$table}_{$name}_key UNIQUE ({$name})';
+                        END IF;";
+        }
+
+        if(isset($column["auto_increment"])) {
+            $auto_increment = "$alter_str ADD GENERATED ALWAYS AS IDENTITY,";
+        }
+
+        if(isset($column["primary_key"])) {
+            $primary_key = "IF NOT EXISTS (
+                                SELECT 1 
+                                FROM information_schema.table_constraints
+                                WHERE table_name='{$table}' 
+                                AND constraint_type='PRIMARY KEY'
+                            ) THEN
+                                EXECUTE 'ALTER TABLE {$table} ADD CONSTRAINT {$table}_pkey PRIMARY KEY ({$name})';
+                            END IF;";
+        }
+
+        if(isset($column["nullable"])) {
+            $nullable = $column["nullable"] ? "" : "$alter_str SET NOT NULL,";
+        }else{
+            $nullable = "$alter_str SET NOT NULL,";
+        }
+
+        $sql = substr(trim("$type $size $default $nullable $auto_increment"), 0, -1) . ";";
+        
+        return "$sql\n $unique\n $primary_key";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
