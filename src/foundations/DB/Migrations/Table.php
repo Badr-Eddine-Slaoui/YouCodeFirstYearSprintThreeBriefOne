@@ -8,7 +8,7 @@ class Table
 {
     private $collumns = [];
 
-    public function get_collumns(): array {
+    public function get_columns(): array {
         return $this->collumns;
     }
 
