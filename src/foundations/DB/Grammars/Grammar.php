@@ -18,4 +18,10 @@ abstract class Grammar {
     abstract public static function dropTableSQL(string $table);
 
     abstract public static function dropTableIfExistsSQL(string $table);
+
+    abstract public static function getMigrationsSQL();
+
+    abstract public static function addMigrationSQL(string $name);
+
+    abstract public static function dropMigrationSQL(string $name);
 }

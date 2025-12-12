@@ -79,4 +79,16 @@ class PostgresGrammar extends Grammar{
     public static function dropTableIfExistsSQL(string $table) {
         return "DROP TABLE IF EXISTS $table;";
     }
+
+    public static function getMigrationsSQL(): string {
+        return "SELECT * FROM migrations";
+    }
+
+    public static function addMigrationSQL(string $name): string {
+        return "INSERT INTO migrations (name) VALUES ('$name')";
+    }
+
+    public static function dropMigrationSQL(string $name): string {
+        return "DELETE FROM migrations WHERE name = '$name'";
+    }
 }
