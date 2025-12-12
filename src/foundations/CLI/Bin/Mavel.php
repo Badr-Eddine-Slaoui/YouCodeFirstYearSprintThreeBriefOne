@@ -69,7 +69,26 @@ class Mavel {
 
                 $date = date("Y_m_d_His");
 
-                $this->buildMigration($name, $date);
+                if(str_contains($name,"create")) {
+                    $this->buildMigration($name, $date);
+                    break;
+                }
+                
+                if(str_contains($name,"add_column")) {
+                    $this->buildAddColumnMigration($name, $date);
+                    break;
+                }
+
+                if(str_contains($name,"remove_column")) {
+                    $this->buildDropColumnMigration($name, $date);
+                    break;
+                }
+
+                if(str_contains($name,"update_column")) {
+                    $this->buildUpdateColumnMigration($name, $date);
+                    break;
+                }
+
                 break;
             }
             case "migrate":{
