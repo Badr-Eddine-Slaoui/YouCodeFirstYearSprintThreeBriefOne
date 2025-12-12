@@ -170,6 +170,10 @@ class PostgresGrammar extends Grammar{
         return "$result END $$;";
     }
 
+    public static function dropColumnSQL(string $table, string $column) {
+        return "ALTER TABLE IF EXISTS $table DROP COLUMN IF EXISTS $column;";
+    }
+
     public static function dropTableSQL(string $table) {
         return "DROP TABLE $table;";
     }
