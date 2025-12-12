@@ -83,6 +83,16 @@ abstract class Migration {
         $db = null;
     }
 
+    protected function dropColumns(string $table, array $name): void {
+        $sql = PostgresGrammar::dropColumnsSQL($table, $name);
+
+        $db = new Database();
+
+        $db->query($sql);
+
+        $db = null;
+    }
+
     public static function getMigrations(): array {
         $sql = PostgresGrammar::compileTableExists('migrations');
 
