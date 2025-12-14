@@ -123,6 +123,40 @@ abstract class Migration {
         $db = null;
     }
 
+    protected function renameTable(string $old, string $new){
+        $sql = PostgresGrammar::renameTableSQL($old, $new);
+
+        $db = new Database();
+
+        $db->query($sql);
+
+        $db = null;
+    }
+
+    protected function renameColumn(string $table, string $old, string $new){
+        $sql = PostgresGrammar::renameColumnSQL($table, $old, $new);
+
+        $db = new Database();
+
+        $db->query($sql);
+
+        $db = null;
+    }
+
+    protected function renameColumns(string $table, array $old, array $new){
+        $sql = PostgresGrammar::renameColumnsSQL($table, $old, $new);
+
+        $db = new Database();
+
+        $db->beginTransaction();
+
+        $db->exec($sql);
+
+        $db->commit();
+
+        $db = null;
+    }
+
     public static function getColumnStructure(string $table, string $column): string {
 
         $sql = PostgresGrammar::compileColumnExists($table, $column);
