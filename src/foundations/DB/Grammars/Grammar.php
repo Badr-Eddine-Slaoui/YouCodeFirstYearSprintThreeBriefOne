@@ -39,6 +39,12 @@ abstract class Grammar {
 
     abstract public static function dropTableIfExistsSQL(string $table): string;
 
+    abstract public static function renameTableSQL(string $old, string $new): string;
+
+    abstract public static function renameColumnSQL(string $table, string $old, string $new): string;
+
+    abstract public static function renameColumnsSQL(string $table, array $old, array $new): string;
+
     abstract public static function getMigrationsSQL(): string;
 
     abstract public static function addMigrationSQL(string $name): string;
