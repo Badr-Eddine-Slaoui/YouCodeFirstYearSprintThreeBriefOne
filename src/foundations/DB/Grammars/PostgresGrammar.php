@@ -262,6 +262,27 @@ class PostgresGrammar extends Grammar{
         return "DROP TABLE IF EXISTS $table;";
     }
 
+    public static function renameTableSQL(string $old, string $new): string
+    {
+        return "ALTER TABLE $old RENAME TO $new;";
+    }
+
+    public static function renameColumnSQL(string $table, string $old, string $new): string
+    {
+        return "ALTER TABLE $table RENAME COLUMN $old TO $new;";
+    }
+
+    public static function renameColumnsSQL(string $table, array $old, array $new): string
+    {
+        $sql = "";
+
+        foreach($old as $key => $column) {
+            $sql .= "ALTER TABLE $table RENAME COLUMN $column TO $new[$key];";
+        }
+
+        return $sql;
+    }
+
     public static function getMigrationsSQL(): string {
         return "SELECT * FROM migrations";
     }
