@@ -89,6 +89,16 @@ class Mavel {
                     break;
                 }
 
+                if(str_contains($name,"rename_table")) {
+                    $this->buildRenameTableMigration($name, $date);
+                    break;
+                }
+
+                if(str_contains($name,"rename_column")) {
+                    $this->buildRenameColumnMigration($name, $date);
+                    break;
+                }
+
                 break;
             }
             case "migrate":{
@@ -156,9 +166,12 @@ class Mavel {
             !preg_match("/^remove_column_{$sc}_from_{$sc}_table$/", $name) &&
             !preg_match("/^remove_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name)&&
             !preg_match("/^update_column_{$sc}_from_{$sc}_table$/", $name) &&
-            !preg_match("/^update_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name)
+            !preg_match("/^update_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name) &&
+            !preg_match("/^rename_table_{$sc}_to_{$sc}$/", $name) &&
+            !preg_match("/^rename_column_{$sc}_from_{$sc}_table$/", $name) &&
+            !preg_match("/^rename_columns_{$sc}(?:_and_{$sc})*_from_{$sc}_table$/", $name)
         ){
-            echo "Migration name must be in this formats:\n    -'create_name_table'\n    -'add_column_name_to_name_table'\n    -'add_columns_name_and_name_to_name_table'\n    -'remove_column_name_from_name_table'\n    -'remove_columns_name_and_name_from_name_table'\nNote: name can only contain lowecase letters and underscores.\n";
+            echo "Migration name must be in this formats:\n    -'create_name_table'\n    -'add_column_name_to_name_table'\n    -'add_columns_name_and_name_to_name_table'\n    -'remove_column_name_from_name_table'\n    -'remove_columns_name_and_name_from_name_table'\n    -'update_column_name_from_name_table'\n    -'update_columns_name_and_name_from_name_table'\n    -'rename_table_name_to_name'\n    -'rename_column_name_from_name_table'\n    -'rename_columns_name_and_name_from_name_table'\nNote: name can only contain lowecase letters and underscores.\n";
             exit(1);
         }
     }
@@ -400,5 +413,91 @@ class Mavel {
         echo "Migration created: $filePath\n";
         
         exit(0);
-    } 
+    }  
+
+    private function buildRenameTableMigration(string $name, string $date): void {
+        $template =  __DIR__ . '/../templates/RenameTableMigration.php';
+        $dir = DATABASE_DIR . '/Migrations';
+        $filePath = "./database/Migrations/$name.php";
+        preg_match('/rename_table_(.*)_to_(.*)/', $name, $matches);
+        $old_name = $matches[1];
+        $new_name = $matches[2];
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $migrations = \glob("$dir/*.php");
+
+        foreach ($migrations as $file) {
+            if(\str_contains($file,$name)) {
+                echo "Migration already exists: ./database/Migrations/". \basename($file) . "\n";
+                return;
+            }
+        }
+
+        $file = "$dir/{$date}_$name.php";
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("old_table_name", $old_name, $content);
+        $content = \str_replace("new_table_name", $new_name, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Migration created: $filePath\n";
+        
+        exit(0);
+    }
+
+    private function buildRenameColumnMigration(string $name, string $date): void {
+        $template =  __DIR__ . '/../templates/RenameColumnMigration.php';
+        $dir = DATABASE_DIR . '/Migrations';
+        $filePath = "./database/Migrations/$name.php";
+        preg_match('/rename_(column|columns)_(.*)_from_(.*)_table/', $name, $matches);
+        $columns_str = $matches[2];
+        $table_name = $matches[3];
+
+        $columns = \explode('_and_', $columns_str);
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $migrations = \glob("$dir/*.php");
+
+        foreach ($migrations as $file) {
+            if(\str_contains($file,$name)) {
+                echo "Migration already exists: ./database/Migrations/". \basename($file) . "\n";
+                return;
+            }
+        }
+
+        $file = "$dir/{$date}_$name.php";
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("table_name", $table_name, $content);
+
+        if(\count($columns) > 1) {
+            $content = \str_replace("renameColumn", "renameColumns", $content);
+            $content = \str_replace("\"old_column_name\"", "['" . implode("', '", $columns) . "']", $content);
+            $dump_str = [];
+            foreach ($columns as $key => $column) {
+                $dump_str[] = "column_{$key}";
+            }
+            $content = \str_replace("\"new_column_name\"", "['" . implode("', '", $dump_str) . "']", $content);
+        }else{
+            $content = \str_replace("old_column_name", $columns[0], $content);
+            $content = \str_replace("new_column_name", "column_1", $content);
+        }
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Migration created: $filePath\n";
+        
+        exit(0);
+    }
 }
