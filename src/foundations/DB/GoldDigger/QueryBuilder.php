@@ -95,4 +95,14 @@ class QueryBuilder{
         }
         return $this;
     }
+
+    public function first(): ?Model
+    {
+        $this->limit = 1;
+
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
+        $row = $this->execute($sql, array_values(array_merge($this->wheres, $this->orWheres, [$this->limit])));
+
+        return $row ? new $this->model($row) : null;
+    }
 }
