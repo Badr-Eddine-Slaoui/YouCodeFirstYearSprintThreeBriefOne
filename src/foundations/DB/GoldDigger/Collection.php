@@ -29,4 +29,9 @@ class Collection implements IteratorAggregate, Countable{
     {
         return $this->items;
     }
+
+    public function first()
+    {
+        return $this->items[0] ?? null;
+    }
 }
