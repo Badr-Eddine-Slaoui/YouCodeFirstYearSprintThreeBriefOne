@@ -50,4 +50,9 @@ class Model{
     {
         $this->attributes[$key] = $value;
     }
+
+    public static function query(): QueryBuilder
+    {
+        return new QueryBuilder(static::class);
+    }
 }
