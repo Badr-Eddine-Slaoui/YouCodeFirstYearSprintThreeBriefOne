@@ -55,4 +55,9 @@ class Model{
     {
         return new QueryBuilder(static::class);
     }
+
+    public function save(): void
+    {
+        static::query()->save($this);
+    }
 }
