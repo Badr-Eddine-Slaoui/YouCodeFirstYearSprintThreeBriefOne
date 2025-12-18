@@ -60,4 +60,12 @@ class Model{
     {
         static::query()->save($this);
     }
+
+    public static function create(array $attributes): static
+    {
+        $model = new static($attributes);
+        $model->save();
+        $model = $model->query()->first();
+        return $model;
+    }
 }
