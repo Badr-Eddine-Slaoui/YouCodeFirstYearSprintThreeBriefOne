@@ -15,4 +15,13 @@ class Model{
     {
         return basename(str_replace('\\', '/', $class));
     }
+
+    protected static function pluralize(string $name): string
+    {
+        return match (true) {
+            str_ends_with($name, 'y') => substr($name, 0, -1) . 'ies',
+            str_ends_with($name, 's') => "{$name}es",
+            default => "{$name}s",
+        };
+    }
 }
