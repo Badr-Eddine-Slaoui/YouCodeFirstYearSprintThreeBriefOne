@@ -68,4 +68,8 @@ class Model{
         $model = $model->query()->first();
         return $model;
     }
+
+    public static function update(array $wheres, array $attributes){
+        return static::query()->update($attributes)->where($wheres)->get();
+    }
 }
