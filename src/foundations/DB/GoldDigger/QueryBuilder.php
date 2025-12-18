@@ -137,4 +137,17 @@ class QueryBuilder{
 
         return array_map(fn($r) => new $this->model($r), $rows);
     }
+
+    public function save(Model $model): void
+    {
+        $data = $model->attributes;
+
+        if (isset($data['id'])) {
+            $sql = $this->grammar()->update($this->table, $data, ['id' => $data['id']]);
+        } else {
+            $sql = $this->grammar()->insert($this->table, $data);
+        }
+
+        $this->execute($sql, array_values($data));
+    }
 }
