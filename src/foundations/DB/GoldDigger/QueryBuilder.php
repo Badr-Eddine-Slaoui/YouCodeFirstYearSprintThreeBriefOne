@@ -113,4 +113,28 @@ class QueryBuilder{
 
         return $row ? new $this->model($row) : null;
     }
+
+    public function get(): array
+    {
+        if(isset($this->toUpdate)){
+            if(is_array($this->toUpdate)){
+                if(count($this->toUpdate) > 0){
+                    $sql = $this->grammar()->update($this->table, $this->toUpdate, $this->wheres, $this->orWheres);
+                    $this->executeAll($sql, array_values(array_merge($this->toUpdate, $this->wheres, $this->orWheres)));
+                }
+            }
+        }
+
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
+        $rows = $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres, $this->limit ? [$this->limit] : [])));
+
+        if(isset($this->toDelete)){
+            if($this->toDelete){
+                $sql = $this->grammar()->delete($this->table, $this->wheres, $this->orWheres);
+                $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres)));
+            }
+        }
+
+        return array_map(fn($r) => new $this->model($r), $rows);
+    }
 }
