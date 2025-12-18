@@ -10,4 +10,9 @@ class Model{
     {
         
     }
+
+    private static function class_basename(string $class): string
+    {
+        return basename(str_replace('\\', '/', $class));
+    }
 }
