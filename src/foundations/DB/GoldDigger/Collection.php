@@ -24,4 +24,9 @@ class Collection implements IteratorAggregate, Countable{
     {
         return \count($this->items);
     }
+
+    public function all(): array
+    {
+        return $this->items;
+    }
 }
