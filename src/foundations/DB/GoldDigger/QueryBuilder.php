@@ -150,4 +150,9 @@ class QueryBuilder{
 
         $this->execute($sql, array_values($data));
     }
+
+    public function update(array $data): static{
+        $this->toUpdate = array_merge($this->toUpdate, $data);
+        return $this;
+    }
 }
