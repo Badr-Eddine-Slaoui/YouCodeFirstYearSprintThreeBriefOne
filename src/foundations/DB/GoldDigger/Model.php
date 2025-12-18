@@ -101,4 +101,8 @@ class Model{
     {
         return static::query()->where('id', $id)->last();
     }
+
+    public static function lastOrFail(int $id): ?static {
+        return static::query()->where('id', $id)->last() ?? abort(404, "{$id} not found");;
+    }
 }
