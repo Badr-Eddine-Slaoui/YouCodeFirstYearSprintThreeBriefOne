@@ -40,4 +40,9 @@ class Model{
     {
         $this->attributes = $attributes;
     }
+
+    public function __get(string $key)
+    {
+        return $this->attributes[$key] ?? null;
+    }
 }
