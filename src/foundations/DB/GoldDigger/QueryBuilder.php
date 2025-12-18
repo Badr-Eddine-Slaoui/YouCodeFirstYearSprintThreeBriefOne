@@ -155,4 +155,9 @@ class QueryBuilder{
         $this->toUpdate = array_merge($this->toUpdate, $data);
         return $this;
     }
+
+    public function delete(): static{
+        $this->toDelete = true;
+        return $this;
+    }
 }
