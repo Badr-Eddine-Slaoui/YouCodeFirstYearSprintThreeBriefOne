@@ -19,4 +19,9 @@ class Collection implements IteratorAggregate, Countable{
     {
         return new ArrayIterator($this->items);
     }
+
+    public function count(): int
+    {
+        return \count($this->items);
+    }
 }
