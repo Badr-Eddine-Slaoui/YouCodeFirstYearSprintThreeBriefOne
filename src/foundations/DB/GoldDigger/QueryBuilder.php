@@ -105,4 +105,12 @@ class QueryBuilder{
 
         return $row ? new $this->model($row) : null;
     }
+
+    public function last(): ?Model
+    {
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
+        $row = $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres, [$this->limit])));
+
+        return $row ? new $this->model($row) : null;
+    }
 }
