@@ -43,4 +43,9 @@ class Collection implements IteratorAggregate, Countable{
 
         return $this;
     }
+
+    public function map(callable $callback): self
+    {
+        return new static(array_map($callback, $this->items));
+    }
 }
