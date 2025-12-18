@@ -14,4 +14,9 @@ class Collection implements IteratorAggregate, Countable{
     {
         $this->items = $items;
     }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
+    }
 }
