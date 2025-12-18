@@ -45,4 +45,9 @@ class Model{
     {
         return $this->attributes[$key] ?? null;
     }
+
+    public function __set(string $key, $value): void
+    {
+        $this->attributes[$key] = $value;
+    }
 }
