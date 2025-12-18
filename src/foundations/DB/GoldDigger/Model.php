@@ -72,4 +72,8 @@ class Model{
     public static function update(array $wheres, array $attributes){
         return static::query()->update($attributes)->where($wheres)->get();
     }
+
+    public static function delete(array $wheres){
+        return static::query()->delete()->where($wheres)->get();
+    }
 }
