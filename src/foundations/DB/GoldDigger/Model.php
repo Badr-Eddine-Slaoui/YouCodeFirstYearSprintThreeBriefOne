@@ -8,7 +8,7 @@ class Model{
 
     public function __construct(array $attributes = [])
     {
-        
+        $this->fill($attributes);
     }
 
     private static function class_basename(string $class): string
@@ -34,5 +34,10 @@ class Model{
         $class = static::class_basename(static::class);
 
         return strtolower(static::pluralize($class));
+    }
+
+    public function fill(array $attributes): void
+    {
+        $this->attributes = $attributes;
     }
 }
