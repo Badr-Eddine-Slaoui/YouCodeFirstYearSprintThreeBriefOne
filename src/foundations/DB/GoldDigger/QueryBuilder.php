@@ -16,4 +16,10 @@ class QueryBuilder{
     protected bool $toDelete = false;
     protected array $joins = [];
     protected ?int $limit = null;
+
+    public function __construct(string $model)
+    {
+        $this->model = $model;
+        $this->table = $this->table = $model::table();
+    }
 }
