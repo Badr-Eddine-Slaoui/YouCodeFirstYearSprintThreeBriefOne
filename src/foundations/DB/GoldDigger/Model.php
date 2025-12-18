@@ -76,4 +76,9 @@ class Model{
     public static function delete(array $wheres){
         return static::query()->delete()->where($wheres)->get();
     }
+
+    public static function find(int $id): ?static
+    {
+        return static::query()->where('id', $id)->first();
+    }
 }
