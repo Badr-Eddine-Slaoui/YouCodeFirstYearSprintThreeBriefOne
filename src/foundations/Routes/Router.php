@@ -3,6 +3,8 @@
 namespace Foundations\Routes;
 
 use Foundations\DB\Database;
+use Foundations\DB\GoldDigger\Model;
+use Foundations\Request\Request;
 use ReflectionMethod;
 
 class Router {
@@ -11,7 +13,7 @@ class Router {
 
     private $routes = [];
     public $namedRoutes = [];
-    private $db;
+    private $modelParamName = null;
 
     public function __construct() {
         self::$instance = $this;
@@ -44,6 +46,24 @@ class Router {
         ];
     }
 
+    private function isModel(int $index, array $route) {
+        [$controller , $action] = explode('@', $route['action']);
+
+        $method = new ReflectionMethod("App\Controllers\\$controller", $action);
+        $param  =  $method->getParameters()[$index];
+
+        while($param->getType()->getName() === Request::class || is_subclass_of($param->getType()->getName(), Request::class)){
+            $param  =  $method->getParameters()[$index++];
+        }
+
+        if(is_subclass_of($param->getType()->getName(), Model::class)){
+            $this->modelParamName = $param->getName();
+            return $param->getType()->getName();
+        }
+
+        return false;
+    }
+
     private function match(array $requestPathArr, array $pathArr, array $route) : bool {
         [$controller , $action] = explode('@', $route['action']);
 
@@ -62,19 +82,38 @@ class Router {
 
         $params = [];
 
+        $pathParamCount = 0;
         foreach ($pathArr as $key => $path) {
             if (preg_match('/^\{[A-Za-z]+\}$/', $path)) {
+                $index = $pathParamCount;
+                $pathParamCount++;
                 $path = substr($path, 1, -1);
-                if(!in_array($path, $paramArr)) {
+                $isModel = $this->isModel($index, $route);
+
+                if(!in_array($path, $paramArr) && $isModel === false) {
                     return false;
                 }else{
                     if(!$requestPathArr[$key]){
                         return false;
                     }
-                    if($paramTypeArr[$path] !== gettype($requestPathArr[$key]) && (int) $requestPathArr[$key] === 0) {
-                        return false;
+    
+                    if($isModel === false){
+                        if($paramTypeArr[$path] !== gettype($requestPathArr[$key]) && (int) $requestPathArr[$key] === 0) {
+                            return false;
+                        }
+
+                        $params[$path] = $requestPathArr[$key];
+                        continue;
                     }
-                    $params[$path] = $requestPathArr[$key];
+
+                    if((int) $requestPathArr[$key] !== 0){
+                        $model = $this->isModel($index, $route);
+                        $params[$this->modelParamName] = $model::findOrFail((int) $requestPathArr[$key]);
+                        $this->modelParamName = null;
+                        continue;
+                    }
+                    
+                    return false;
                 }
             }else if ($path !== $requestPathArr[$key]) {
                 return false;
