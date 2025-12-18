@@ -67,4 +67,8 @@ class QueryBuilder{
         }
         return $this;
     }
+
+    public function selects(): array{
+        return count($this->selects) > 0 ? $this->selects : ['*' => null];
+    }
 }
