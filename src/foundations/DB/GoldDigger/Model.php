@@ -96,4 +96,9 @@ class Model{
     {
         return static::query()->where($attributes)->first() ?? static::create($attributes);
     }
+
+    public static function last(int $id): ?static
+    {
+        return static::query()->where('id', $id)->last();
+    }
 }
