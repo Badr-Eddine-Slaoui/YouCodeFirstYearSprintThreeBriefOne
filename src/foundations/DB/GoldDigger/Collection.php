@@ -34,4 +34,13 @@ class Collection implements IteratorAggregate, Countable{
     {
         return $this->items[0] ?? null;
     }
+
+    public function each(callable $callback): self
+    {
+        foreach ($this->items as $item) {
+            $callback($item);
+        }
+
+        return $this;
+    }
 }
