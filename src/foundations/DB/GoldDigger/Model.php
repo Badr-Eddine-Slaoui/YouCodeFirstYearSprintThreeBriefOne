@@ -24,4 +24,15 @@ class Model{
             default => "{$name}s",
         };
     }
+
+    public static function table(): string
+    {
+        if (static::$table) {
+            return static::$table;
+        }
+
+        $class = static::class_basename(static::class);
+
+        return strtolower(static::pluralize($class));
+    }
 }
