@@ -91,4 +91,9 @@ class Model{
     {
         return static::query()->where('id', $id)->first() ?? new static();
     }
+
+    public static function findOrCreate(array $attributes): static
+    {
+        return static::query()->where($attributes)->first() ?? static::create($attributes);
+    }
 }
