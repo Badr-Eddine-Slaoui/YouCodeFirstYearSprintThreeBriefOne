@@ -22,4 +22,17 @@ class QueryBuilder{
         $this->model = $model;
         $this->table = $this->table = $model::table();
     }
+
+    protected function execute(string $sql, array $bindings = []): ?array
+    {
+        $db = new Database();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($bindings);
+
+        $result = $stmt->fetch();
+
+        $db = null;
+
+        return $result ?: null;
+    }
 }
