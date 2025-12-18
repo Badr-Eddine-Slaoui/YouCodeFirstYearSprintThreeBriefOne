@@ -63,7 +63,7 @@ class Container
         foreach ($params as $param) {
             $type = $param->getType();
 
-            if (!$type) {
+            if ($type->isBuiltin()) {
                 if ($param->isDefaultValueAvailable()) {
                     $dependencies[] = $param->getDefaultValue();
                     continue;
