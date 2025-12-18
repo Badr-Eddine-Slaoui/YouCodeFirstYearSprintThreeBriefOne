@@ -71,4 +71,16 @@ class QueryBuilder{
     public function selects(): array{
         return count($this->selects) > 0 ? $this->selects : ['*' => null];
     }
+
+    public function where(string|array $column, $value = null): self
+    {
+        if (is_string($column)) {
+            if (isset($value)) {
+                $this->wheres[$column] = $value;
+            }
+        } else {
+            $this->wheres = array_merge($this->wheres, $column);
+        }
+        return $this;
+    }
 }
