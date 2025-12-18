@@ -83,4 +83,16 @@ class QueryBuilder{
         }
         return $this;
     }
+
+    public function orWhere(string|array $column, $value = null): self
+    {
+        if (is_string($column)) {
+            if (isset($value)) {
+                $this->orWheres[$column] = $value;
+            }
+        } else {
+            $this->orWheres = array_merge($this->orWheres, $column);
+        }
+        return $this;
+    }
 }
