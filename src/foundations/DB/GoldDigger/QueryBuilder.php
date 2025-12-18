@@ -51,4 +51,20 @@ class QueryBuilder{
     {
         return new PostgresGrammar();
     }
+
+    public function select(string|array $column, ?string $alias = null): self
+    {
+        if (is_string($column)) {
+            $this->selects[$column] = $alias;
+        } else {
+            foreach ($column as $key => $value) {
+                if (is_int($key)) {
+                    $this->selects[$value] = null;
+                } else {
+                    $this->selects[$key] = $value;
+                }
+            }
+        }
+        return $this;
+    }
 }
