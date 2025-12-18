@@ -46,4 +46,9 @@ class QueryBuilder{
 
         return $stmt->fetchAll();
     }
+
+    protected function grammar(): Grammar
+    {
+        return new PostgresGrammar();
+    }
 }
