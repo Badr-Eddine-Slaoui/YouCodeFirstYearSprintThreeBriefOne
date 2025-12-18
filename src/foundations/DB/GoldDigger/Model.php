@@ -109,4 +109,9 @@ class Model{
     public static function lastOrInit(int $id): ?static {
         return static::query()->where('id', $id)->last() ?? new static();
     }
+
+    public static function lastOrCreate(array $attributes): static
+    {
+        return static::query()->where($attributes)->last() ?? static::create($attributes);
+    }
 }
