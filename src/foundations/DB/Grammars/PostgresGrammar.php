@@ -5,6 +5,134 @@ namespace Foundations\DB\Grammars;
 use Foundations\DB\Migrations\Column;
 
 class PostgresGrammar extends Grammar{
+    public function select(string $table, array $columns, array $wheres = [], array $orWheres = [], ?int $limit = null): string
+    {
+        $selects = "";
+
+        foreach ($columns as $key => $value) {
+            if (!isset($value)) {
+                $selects .= "{$key}, ";
+            } else {
+                $selects .= "{$key} AS {$value}, ";
+            }
+        }
+
+        $sql = 'SELECT ' . substr($selects, 0, -2) . " FROM {$table}";
+
+        if (count($wheres) > 0) {
+            $conditions = implode(' AND ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($wheres)
+            ));
+            
+            if (str_contains($sql,"WHERE")) {
+                $sql .= " AND {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        if (count($orWheres) > 0) {
+            $conditions = implode(' OR ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($orWheres)
+            ));
+
+            if(str_contains($sql,"WHERE")) {
+                $sql .= " OR {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        if ($limit) {
+            $sql .= " LIMIT ?";
+        }
+
+        return $sql;
+    }
+
+    public function insert(string $table, array $data): string
+    {
+        $columns = implode(', ', array_keys($data));
+        $values  = implode(', ', array_fill(0, count($data), '?'));
+
+        return "INSERT INTO {$table} ({$columns}) VALUES ({$values})";
+    }
+
+    public function update(string $table, array $data, array $wheres = [], array $orWheres = []): string
+    {
+        $sql = "UPDATE {$table} SET ";
+
+        $set = implode(', ', array_map(
+            fn($col) => "{$col} = ?",
+            array_keys($data)
+        ));
+
+        $sql .= $set;
+
+        if (count($wheres) > 0) {
+            $conditions = implode(' AND ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($wheres)
+            ));
+            
+            if (str_contains($sql,"WHERE")) {
+                $sql .= " AND {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        if (count($orWheres) > 0) {
+            $conditions = implode(' OR ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($orWheres)
+            ));
+
+            if(str_contains($sql,"WHERE")) {
+                $sql .= " OR {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        return $sql;
+    }
+
+    public function delete(string $table, array $wheres = [], array $orWheres = []): string{
+        $sql = "DELETE FROM {$table} ";
+
+        if (count($wheres) > 0) {
+            $conditions = implode(' AND ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($wheres)
+            ));
+            
+            if (str_contains($sql,"WHERE")) {
+                $sql .= " AND {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        if (count($orWheres) > 0) {
+            $conditions = implode(' OR ', array_map(
+                fn($col) => "{$col} = ?",
+                array_keys($orWheres)
+            ));
+
+            if(str_contains($sql,"WHERE")) {
+                $sql .= " OR {$conditions}";
+            } else {
+                $sql .= " WHERE {$conditions}";
+            }
+        }
+
+        return $sql;
+
+    }
+
     public static function compileTableExists(string $table): string {
         return "SELECT * FROM information_schema.tables WHERE table_name = '$table'";
     }

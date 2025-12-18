@@ -5,6 +5,14 @@ namespace Foundations\DB\Grammars;
 use Foundations\DB\Migrations\Column;
 
 abstract class Grammar {
+    abstract public function select(string $table, array $columns, array $wheres = [], array $orWheres = [], ?int $limit = null): string;
+
+    abstract public function insert(string $table, array $data): string;
+
+    abstract public function update(string $table, array $data, array $wheres = [], array $orWheres = []): string;
+
+    abstract public function delete(string $table, array $wheres = [], array $orWheres = []): string;
+
     abstract public static function compileTableExists(string $table): string;
 
     abstract public static function compileColumnExists(string $table, string $column): string;
