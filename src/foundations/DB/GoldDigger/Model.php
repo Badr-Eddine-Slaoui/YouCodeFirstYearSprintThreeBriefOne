@@ -86,4 +86,9 @@ class Model{
     {
         return static::query()->where('id', $id)->first() ?? abort(404, "{$id} not found");
     }
+
+    public static function findOrInit(int $id): ?static
+    {
+        return static::query()->where('id', $id)->first() ?? new static();
+    }
 }
