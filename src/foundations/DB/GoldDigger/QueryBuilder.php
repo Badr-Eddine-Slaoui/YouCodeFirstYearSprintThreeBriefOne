@@ -35,4 +35,15 @@ class QueryBuilder{
 
         return $result ?: null;
     }
+
+    protected function executeAll(string $sql, array $bindings = []): array
+    {
+        $db = new Database();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($bindings);
+
+        $db = null;
+
+        return $stmt->fetchAll();
+    }
 }
