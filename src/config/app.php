@@ -170,8 +170,11 @@ function dd(mixed ...$var): never {
 function page(): string {
     try{
         $page = $_SERVER['REQUEST_URI'];
-        $page = explode('/', $page);
-        $page = end($page);
+        $pages = explode('/', $page);
+        $page = end($pages);
+        if((int) $page > 0) {
+            $page = $pages[count($pages) -2];
+        }
         $page = str_replace('.mavel.php', '', $page);
         return $page;
     }catch(Exception $e){
