@@ -28,4 +28,20 @@ class Session{
         session_save_path($path);
     }
 
+    public static function setLifetime(int $seconds){
+        if (static::isStarted()) {
+            return;
+        }
+
+        ini_set('session.gc_maxlifetime', $seconds);
+
+        session_set_cookie_params([
+            'lifetime' => $seconds,
+            'path' => '/',
+            'httponly' => true,
+            'secure' => isset($_SERVER['HTTPS']),
+            'samesite' => 'Lax'
+        ]);
+    }
+
 }
