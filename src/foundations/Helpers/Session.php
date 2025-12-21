@@ -63,4 +63,9 @@ class Session{
         unset($_SESSION[$key]);
     }
 
+    public static function has($key){
+        static::start();
+        return isset($_SESSION[$key]) || isset($_SESSION["_flash"][$key]);
+    }
+
 }
