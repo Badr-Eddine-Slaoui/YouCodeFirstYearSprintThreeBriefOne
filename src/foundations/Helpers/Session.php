@@ -16,4 +16,16 @@ class Session{
         session_start();
     }
 
+    public static function setSavePath(string $path){
+        if (static::isStarted()) {
+            return;
+        }
+
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        session_save_path($path);
+    }
+
 }
