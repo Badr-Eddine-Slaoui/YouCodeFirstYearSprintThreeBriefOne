@@ -99,4 +99,22 @@ class Auth{
 
         return false;
     }
+
+    public static function user(): ?Model{
+        if (!static::check()) {
+            return null;
+        }
+
+        $config = static::config();
+        $guard = $config["defaults"]["guard"];
+        $provider = $config["guards"][$guard]["provider"];
+        $providerDriver = $config["providers"][$provider]["driver"];
+
+        if($providerDriver === "golddigger"){
+            $model = $config["providers"][$provider]["model"];
+            return $model::find(Session::get('user_id'));
+        }
+
+        return null;
+    }
 }
