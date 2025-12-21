@@ -13,7 +13,7 @@ class Kernel extends MiddlewaresKernel
     ];
 
     protected static array $middlewareAliases = [
-        
+        'is_authed' => isAuthed::class 
     ];
 
 }
