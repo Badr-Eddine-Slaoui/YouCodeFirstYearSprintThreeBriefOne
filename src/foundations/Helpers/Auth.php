@@ -50,4 +50,28 @@ class Auth{
         return false;
 
     }
+
+    public static function register(array $data): Model|bool{
+        $config = static::config();
+        $guard = $config["defaults"]["guard"];
+        $provider = $config["guards"][$guard]["provider"];
+        $providerDriver = $config["providers"][$provider]["driver"];
+
+        if($providerDriver === "golddigger"){
+            $model = $config["providers"][$provider]["model"];
+
+            $data["password"] = password_hash($data["password"], PASSWORD_BCRYPT);
+
+            $user = $model::create($data);
+
+            if($user){
+                return $user;
+            }
+
+            return false;
+
+        }
+
+        return false;
+    }
 }
