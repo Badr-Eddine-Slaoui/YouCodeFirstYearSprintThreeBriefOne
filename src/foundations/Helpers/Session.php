@@ -68,4 +68,9 @@ class Session{
         return isset($_SESSION[$key]) || isset($_SESSION["_flash"][$key]);
     }
 
+    public static function forget(){
+        static::start();
+        $_SESSION = [];
+    }
+
 }
