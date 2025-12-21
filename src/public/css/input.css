@@ -70,6 +70,9 @@ body {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(139, 92, 246, 0.1);
+   box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .accent-gradient {
@@ -234,9 +237,28 @@ body {
   right: 0;
 }
 
-
-
-
+/* profile page */
+.digitalwave-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .digitalwave-light {
+            background-color: #f1f5f9;
+        }
+        
+        .digitalwave-text {
+            color: #4f46e5;
+        }
+        
+        .digitalwave-border {
+            border-color: #e2e8f0;
+        }
+        
+        .input-focus:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

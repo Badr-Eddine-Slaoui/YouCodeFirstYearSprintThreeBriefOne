@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 use Foundations\DB\GoldDigger\Model;
 
-class Admin extends Model{
+class User extends Model{
 
 }
