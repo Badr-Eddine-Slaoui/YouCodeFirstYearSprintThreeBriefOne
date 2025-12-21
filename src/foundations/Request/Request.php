@@ -3,6 +3,13 @@
 namespace Foundations\Request;
 
 class Request {
+
+    private $inputs = [];
+
+    public function __construct() {
+        $this->inputs = $this->inputs();
+    }
+
     public function uri() {
         return $_SERVER['REQUEST_URI'];
     }
@@ -24,7 +31,23 @@ class Request {
     }
 
     public function input($key) {
-        return $_REQUEST[$key];
+        return $this->inputs[$key];
+    }
+
+    public function only(array $keys) {
+        return array_intersect_key($this->inputs, array_flip($keys));
+    }
+
+    public function except(array $keys) {
+        return array_diff_key($this->inputs, array_flip($keys));
+    }
+
+    public function __get(string $key) {
+        return $this->input($key);
+    }
+
+    public function __set(string $key, $value) {
+        $this->inputs[$key] = $value;
     }
 
     public function file($key) {
