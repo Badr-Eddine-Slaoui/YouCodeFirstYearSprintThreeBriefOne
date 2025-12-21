@@ -5,6 +5,7 @@ namespace Foundations\Services;
 use Foundations\DI\Container;
 use Foundations\Routes\Router;
 use Dotenv\Dotenv;
+use Foundations\Helpers\Session;
 
 class AppServiceProvider {
 
@@ -17,6 +18,9 @@ class AppServiceProvider {
 
     public function boot(Container $container)
     {
+        Session::setSavePath(__DIR__ . '/../../storage/sessions');
+        Session::setLifetime(30 * 24 * 60 * 60);
+        Session::start();
 
         require_once __DIR__.'/../../config/app.php';
 
