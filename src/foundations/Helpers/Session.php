@@ -114,4 +114,9 @@ class Session{
         return $value;
     }
 
+    public static function regenerate(){
+        static::start();
+        session_regenerate_id(true);
+    }
+
 }
