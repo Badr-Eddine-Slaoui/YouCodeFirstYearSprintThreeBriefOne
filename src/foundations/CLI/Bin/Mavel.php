@@ -24,6 +24,12 @@ class Mavel {
                 if ($arg === '--resource') {
                     $this->options['resource'] = true;
                 }
+                if ($arg === '-c') {
+                    $this->options['c'] = true;
+                }
+                if ($arg === '--controller') {
+                    $this->options['controller'] = true;
+                }
                 continue;
             }
             $this->argv[] = $arg;
@@ -59,6 +65,30 @@ class Mavel {
                 } else {
                     $this->buildFile($name,"Controller");
                 }
+
+                break;
+            }
+            case 'build/model':{
+                $name = $this->getName("Model");
+
+                $optC = isset($this->options['c']) || isset($this->options['controller']);
+                $optR = isset($this->options['r']) || isset($this->options['resource']);
+
+                $this->validateName($name, 'Model');
+
+                if ($optC) {
+                    $name = "{$name}Controller";
+                    if ($optR) {
+                        $this->buildFile($name, "ResourceController");
+                    } else {
+                        $this->buildFile($name,"Controller");
+                    }
+                    $name = str_replace("Controller", "", $name);
+                }
+
+                $name = str_replace("Model", "", $name);
+
+                $this->buildModel($name);
 
                 break;
             }
@@ -228,11 +258,11 @@ class Mavel {
         echo "$postfix created: $filePath\n";
     }
 
-    private function buildModel(string $name, string $date): void {
+    private function buildModel(string $name): void {
 
         $template =  __DIR__ . '/../templates/Model.php';
-        $dir = APP_DIR . '/Model';
-        $filePath = "./app/Model/$name.php";
+        $dir = APP_DIR . '/Models';
+        $filePath = "./app/Models/$name.php";
 
         if (!\is_dir($dir)) \mkdir($dir, 0777, true);
 
