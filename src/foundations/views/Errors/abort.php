@@ -15,7 +15,7 @@
         <!-- Background Shapes -->
 
         <div class="content animate_top">
-          <img src="images/404.svg" alt="404" class="error-img">
+          <img src="<?= asset("images/404.svg") ?>" alt="404" class="error-img">
 
           <h2>Sorry, the page can’t be found</h2>
           <p>
