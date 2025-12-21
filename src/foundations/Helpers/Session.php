@@ -8,4 +8,12 @@ class Session{
         return session_status() === PHP_SESSION_ACTIVE;
     }
 
+    public static function start(){
+        if (self::isStarted()) {
+            return;
+        }
+
+        session_start();
+    }
+
 }
