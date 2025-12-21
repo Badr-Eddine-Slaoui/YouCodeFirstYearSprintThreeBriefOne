@@ -10,4 +10,8 @@ abstract class Kernel{
     protected static array $globalMiddleware = [];
     protected static array $middlewareAliases = [];
     private static array $middleware = [];
+
+    public static function setMiddleware(string $middleware): void{
+        self::$middleware[] = static::$middlewareAliases[$middleware] ?? $middleware;
+    }
 }
