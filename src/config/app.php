@@ -28,8 +28,8 @@ function parseMavel(string $content) {
         $content
     );
 
-    $content = str_replace(
-        "@endlayout",
+    $content = preg_replace(
+        "/@endlayout/",
         "<?php \$content = ob_get_clean(); view(\$__layout, ['content' => \$content]); ?>",
         $content
     );
@@ -37,6 +37,79 @@ function parseMavel(string $content) {
     $content = preg_replace(
         "/@asset\(['\"](.+?)['\"]\)/",
         "<?php echo asset('$1'); ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@auth/",
+        "<?php if (auth()->check()) : ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@endauth/",
+        "<?php endif; ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@guest/",
+        "<?php if (!auth()->check()) : ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@endguest/",
+        "<?php endif; ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@if\s*\((.*)\)/",
+        "<?php if ($1) : ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@elseif\s*\((.*)\)/",
+        "<?php else if ($1) : ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@endif/",
+        "<?php endif; ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@php/",
+        "<?php ",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@endphp/",
+        " ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@route\(['\"](.+?)['\"](, \[(.+?)\])?\)/",
+        "<?php echo route('$1', [$3]); ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@page\((.+?) \? (.+?) : (.+?)\)/",
+        "<?php echo page() === $1 ? $2 : $3; ?>",
+        $content
+    );
+
+    //echo strings
+    $content = preg_replace(
+        "/{{ (.+?) }}/",
+        "<?php echo $1; ?>",
         $content
     );
 
