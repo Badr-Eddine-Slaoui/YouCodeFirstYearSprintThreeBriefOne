@@ -119,4 +119,9 @@ class Session{
         session_regenerate_id(true);
     }
 
+    public static function all(){
+        static::start();
+        return $_SESSION;
+    }
+
 }
