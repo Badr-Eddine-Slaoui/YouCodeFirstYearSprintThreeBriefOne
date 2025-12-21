@@ -1,6 +1,8 @@
 <?php
 
 use Foundations\DI\Container;
+use Foundations\Helpers\Auth;
+use Foundations\Helpers\Session;
 use Foundations\Routes\Router;
 
 define('CACHE_DIR', __DIR__.'/../cache');
@@ -175,4 +177,12 @@ function page(): string {
     }catch(Exception $e){
         show_error_view($e);
     }
+}
+
+function auth(): Auth{
+    return new Auth();
+}
+
+function session(): Session{
+    return new Session();
 }
