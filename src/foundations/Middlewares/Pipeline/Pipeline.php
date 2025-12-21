@@ -15,4 +15,10 @@ class Pipeline
         $this->request = $request;
         return $this;
     }
+
+    public function through(array $middlewares): static
+    {
+        $this->middlewares = $middlewares;
+        return $this;
+    }
 }
