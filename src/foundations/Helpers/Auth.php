@@ -74,4 +74,11 @@ class Auth{
 
         return false;
     }
+
+    public static function logout(): bool{
+        Session::destroy();
+        Session::start();
+        Session::regenerate();
+        return true;
+    }
 }
