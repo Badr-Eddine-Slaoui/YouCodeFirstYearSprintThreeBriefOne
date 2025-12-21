@@ -53,4 +53,9 @@ class Session{
         }
     }
 
+    public static function set($key, $value){
+        static::start();
+        $_SESSION[$key] = $value;
+    }
+
 }
