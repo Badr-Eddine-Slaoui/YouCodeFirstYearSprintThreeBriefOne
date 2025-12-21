@@ -2,6 +2,7 @@
 
 namespace Foundations\Routes;
 
+use App\Kernel;
 use Foundations\DB\Database;
 use Foundations\DB\GoldDigger\Model;
 use Foundations\Request\Request;
@@ -37,12 +38,18 @@ class Router {
         return $this;
     }
 
+    public function middleware(array $middleware) {
+        $this->routes[count($this->routes) - 1]["middleware"] = $middleware;
+        return $this;
+    }
+
     private function add(string $method, string $path, string $action) {
         $this->routes[] = [
             'method' => strtoupper($method),
             'path' => $path,
             'action' => $action,
-            'name' => ""
+            'name' => "",
+            'middleware' => []
         ];
     }
 
@@ -121,7 +128,14 @@ class Router {
         }
 
         global $container;
-        $container->call([$controller, $action], $params);
+
+        foreach($route["middleware"] as $middleware){
+            Kernel::setMiddleware($middleware);
+        }
+
+        Kernel::handle(new Request(), function() use ($container, $controller, $action, $params) {
+            $container->call([$controller, $action], $params);
+        });
 
         return true;
     }
