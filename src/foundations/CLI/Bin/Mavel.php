@@ -201,13 +201,7 @@ class Mavel {
                 "dir" => APP_DIR . '/Controllers',
                 "filePath" => "./app/Controllers/$name.php",
                 "name"=> $name
-            ],
-            "Migration" => [
-                "template"=> __DIR__ . '/../templates/Migration.php',
-                "dir" => DATABASE_DIR . '/Migrations',
-                "filePath" => "./database/Migrations/$name.php",
-                "name"=> str_replace("create_", "", str_replace("_table", "", $name))
-            ],
+            ]
         ];
 
         $dir = $dirs[$postfix]['dir'];
@@ -232,6 +226,33 @@ class Mavel {
         \chmod($file, 0777);
 
         echo "$postfix created: $filePath\n";
+    }
+
+    private function buildModel(string $name, string $date): void {
+
+        $template =  __DIR__ . '/../templates/Model.php';
+        $dir = APP_DIR . '/Model';
+        $filePath = "./app/Model/$name.php";
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $file = "$dir/$name.php";
+        
+        if (\file_exists($file)) {
+            echo "Model already exists: $filePath\n";
+            return;
+        }
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("ModelName", $name, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Model created: $filePath\n";
     }
 
     private function buildMigration(string $name, string $date): void {
