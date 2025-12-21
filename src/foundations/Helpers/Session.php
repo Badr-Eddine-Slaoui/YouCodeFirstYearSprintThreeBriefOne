@@ -58,4 +58,9 @@ class Session{
         $_SESSION[$key] = $value;
     }
 
+    public static function delete($key){
+        static::start();
+        unset($_SESSION[$key]);
+    }
+
 }
