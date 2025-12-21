@@ -81,4 +81,22 @@ class Auth{
         Session::regenerate();
         return true;
     }
+
+    public static function check(): bool{
+        if (!Session::has('user_id')) {
+            return false;
+        }
+
+        $config = static::config();
+        $guard = $config["defaults"]["guard"];
+        $provider = $config["guards"][$guard]["provider"];
+        $providerDriver = $config["providers"][$provider]["driver"];
+
+        if($providerDriver === "golddigger"){
+            $model = $config["providers"][$provider]["model"];
+            return (bool) $model::find(Session::get('user_id'));
+        }
+
+        return false;
+    }
 }
