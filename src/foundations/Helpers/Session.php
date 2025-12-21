@@ -98,4 +98,20 @@ class Session{
         $_SESSION['_flash'][$key] = $value;
     }
 
+    public static function getFlash($key, $default = null){
+        static::start();
+        if (!isset($_SESSION['_flash'][$key])) {
+            return $default;
+        }
+
+        $value = $_SESSION['_flash'][$key];
+        unset($_SESSION['_flash'][$key]);
+
+        if (empty($_SESSION['_flash'])) {
+            unset($_SESSION['_flash']);
+        }
+
+        return $value;
+    }
+
 }
