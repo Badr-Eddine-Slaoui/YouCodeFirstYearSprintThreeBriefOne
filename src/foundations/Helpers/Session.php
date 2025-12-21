@@ -44,4 +44,13 @@ class Session{
         ]);
     }
 
+    public static function get($key, $default = null){
+        static::start();
+        if(isset($_SESSION[$key])){
+            return $_SESSION[$key];
+        }else{
+            return $default;
+        }
+    }
+
 }
