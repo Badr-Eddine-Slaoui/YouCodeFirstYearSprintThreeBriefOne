@@ -92,6 +92,15 @@ class Mavel {
 
                 break;
             }
+            case 'build/middleware':{
+                $name = $this->getName("Middleware");
+
+                $this->validateName($name, 'Middleware');
+
+                $this->buildMiddleware($name);
+
+                break;
+            }
             case "build/migration":{
                 $name = $this->getName("migration");
 
@@ -181,7 +190,7 @@ class Mavel {
         
         $name = \ucfirst($name);
 
-        if (!\strpos($name, $postfix) && $postfix != "Model") {
+        if (!\strpos($name, $postfix) && $postfix != "Model" && $postfix != "Middleware") {
             $name .= $postfix;
         }
     }
