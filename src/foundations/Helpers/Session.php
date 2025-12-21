@@ -93,4 +93,9 @@ class Session{
         session_destroy();
     }
 
+    public static function flash($key, $value){
+        static::start();
+        $_SESSION['_flash'][$key] = $value;
+    }
+
 }
