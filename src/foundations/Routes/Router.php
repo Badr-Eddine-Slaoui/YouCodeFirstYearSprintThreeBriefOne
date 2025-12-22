@@ -5,6 +5,7 @@ namespace Foundations\Routes;
 use App\Kernel;
 use Foundations\DB\Database;
 use Foundations\DB\GoldDigger\Model;
+use Foundations\Request\FormRequest;
 use Foundations\Request\Request;
 use ReflectionMethod;
 
@@ -15,6 +16,7 @@ class Router {
     private $routes = [];
     public $namedRoutes = [];
     private $modelParamName = null;
+    private $requestFormParamName = null;
 
     public function __construct() {
         self::$instance = $this;
@@ -57,15 +59,39 @@ class Router {
         [$controller , $action] = explode('@', $route['action']);
 
         $method = new ReflectionMethod("App\Controllers\\$controller", $action);
-        $param  =  $method->getParameters()[$index];
+        $count = count($method->getParameters());
+        if ($count > $index) {
+            $param  =  $method->getParameters()[$index];
 
-        while($param->getType()->getName() === Request::class || is_subclass_of($param->getType()->getName(), Request::class)){
-            $param  =  $method->getParameters()[$index++];
+            while($param->getType()->getName() === Request::class || is_subclass_of($param->getType()->getName(), Request::class) && $index < $count - 1){
+                $param  =  $method->getParameters()[$index++];
+            }
+
+            if(is_subclass_of($param->getType()->getName(), Model::class)){
+                $this->modelParamName = $param->getName();
+                return $param->getType()->getName();
+            }
         }
 
-        if(is_subclass_of($param->getType()->getName(), Model::class)){
-            $this->modelParamName = $param->getName();
-            return $param->getType()->getName();
+        return false;
+    }
+
+    private function isFormRequest(int $index, array $route) {
+        [$controller , $action] = explode('@', $route['action']);
+
+        $method = new ReflectionMethod("App\Controllers\\$controller", $action);
+        $count = count($method->getParameters());
+        if($count > $index){
+            $param  =  $method->getParameters()[$index];
+
+            while($param->getType()->getName() !== FormRequest::class && !is_subclass_of($param->getType()->getName(), FormRequest::class) && $index < $count - 1){
+                $param  =  $method->getParameters()[$index++];
+            }
+
+            if(is_subclass_of($param->getType()->getName(), FormRequest::class)){
+                $this->requestFormParamName = $param->getName();
+                return $param->getType()->getName();
+            }
         }
 
         return false;
@@ -89,11 +115,11 @@ class Router {
 
         $params = [];
 
-        $pathParamCount = 0;
         foreach ($pathArr as $key => $path) {
+            $pathParamCount = 0;
+            $index = $pathParamCount;
+            $pathParamCount++;
             if (preg_match('/^\{[A-Za-z]+\}$/', $path)) {
-                $index = $pathParamCount;
-                $pathParamCount++;
                 $path = substr($path, 1, -1);
                 $isModel = $this->isModel($index, $route);
 
@@ -104,7 +130,7 @@ class Router {
                         return false;
                     }
     
-                    if($isModel === false){
+                    if($isModel === false) {
                         if($paramTypeArr[$path] !== gettype($requestPathArr[$key]) && (int) $requestPathArr[$key] === 0) {
                             return false;
                         }
@@ -113,17 +139,30 @@ class Router {
                         continue;
                     }
 
-                    if((int) $requestPathArr[$key] !== 0){
-                        $model = $this->isModel($index, $route);
-                        $params[$this->modelParamName] = $model::findOrFail((int) $requestPathArr[$key]);
-                        $this->modelParamName = null;
-                        continue;
+                    if($isModel){
+                        if((int) $requestPathArr[$key] !== 0){
+                            $model = $this->isModel($index, $route);
+                            $params[$this->modelParamName] = $model::findOrFail((int) $requestPathArr[$key]);
+                            $this->modelParamName = null;
+                            continue;
+                        }
                     }
                     
                     return false;
                 }
-            }else if ($path !== $requestPathArr[$key]) {
-                return false;
+            }else{
+                if ($path !== $requestPathArr[$key]){
+                    return false;
+                }
+
+                $isFormRequest = $this->isFormRequest($index, $route);
+                if($isFormRequest){
+                    $requestForm = $this->isFormRequest($index, $route);
+                    $params[$this->requestFormParamName] = new $requestForm();
+                    $params[$this->requestFormParamName]->handleValidationErrors();
+                    $this->requestFormParamName = null;
+                    continue;
+                }
             }
         }
 
@@ -141,6 +180,8 @@ class Router {
         foreach ($this->routes as $route) {
             $pathArr = explode('/', $route['path']);
             $requestPathArr = explode('/', $requestPath);
+            array_shift($pathArr);
+            array_shift($requestPathArr);
 
             if (count($pathArr) !== count($requestPathArr) || $requestMethod !== $route['method']) {
                 continue;
