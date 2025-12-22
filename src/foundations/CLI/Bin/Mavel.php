@@ -92,6 +92,15 @@ class Mavel {
 
                 break;
             }
+            case 'build/request':{
+                $name = $this->getName("Request");
+
+                $this->validateName($name, 'Request');
+
+                $this->buildFormRequest($name);
+
+                break;
+            }
             case 'build/middleware':{
                 $name = $this->getName("Middleware");
 
