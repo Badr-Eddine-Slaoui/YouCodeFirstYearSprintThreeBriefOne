@@ -70,48 +70,64 @@ class Model{
     }
 
     public static function update(array $wheres, array $attributes){
-        return static::query()->update($attributes)->where($wheres)->get();
+        $query = static::query()->update($attributes);
+        foreach ($wheres as $key => $value) {
+            $query->where($key, "=", $value);
+        }
+        return $query->get();
     }
 
     public static function delete(array $wheres){
-        return static::query()->delete()->where($wheres)->get();
+        $query = static::query();
+        foreach ($wheres as $key => $value) {
+            $query->where($key, "=", $value);
+        }
+        return $query->get();
     }
 
     public static function find(int $id): ?static
     {
-        return static::query()->where('id', $id)->first();
+        return static::query()->where('id', "=", $id)->first();
     }
 
     public static function findOrFail(int $id): ?static
     {
-        return static::query()->where('id', $id)->first() ?? abort(404, "{$id} not found");
+        return static::query()->where('id', "=", $id)->first() ?? abort(404, "{$id} not found");
     }
 
     public static function findOrInit(int $id): ?static
     {
-        return static::query()->where('id', $id)->first() ?? new static();
+        return static::query()->where('id', "=", $id)->first() ?? new static();
     }
 
     public static function findOrCreate(array $attributes): static
     {
-        return static::query()->where($attributes)->first() ?? static::create($attributes);
+        $query = static::query();
+        foreach ($attributes as $key => $value) {
+            $query->where($key, "=", $value);
+        }
+        return $query->first() ?? static::create($attributes);
     }
 
     public static function last(int $id): ?static
     {
-        return static::query()->where('id', $id)->last();
+        return static::query()->where('id', "=", $id)->last();
     }
 
     public static function lastOrFail(int $id): ?static {
-        return static::query()->where('id', $id)->last() ?? abort(404, "{$id} not found");;
+        return static::query()->where('id', "=", $id)->last() ?? abort(404, "{$id} not found");;
     }
 
     public static function lastOrInit(int $id): ?static {
-        return static::query()->where('id', $id)->last() ?? new static();
+        return static::query()->where('id', "=", $id)->last() ?? new static();
     }
 
     public static function lastOrCreate(array $attributes): static
     {
-        return static::query()->where($attributes)->last() ?? static::create($attributes);
+        $query = static::query();
+        foreach ($attributes as $key => $value) {
+            $query->where($key, "=", $value);
+        }
+        return $query->last() ?? static::create($attributes);
     }
 }
