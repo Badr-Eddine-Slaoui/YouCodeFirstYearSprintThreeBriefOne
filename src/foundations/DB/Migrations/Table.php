@@ -25,6 +25,13 @@ class Table
         return $column;
     }
 
+    public function char(string $name): Column {
+        $column = new Column($name);
+        $column->type('CHAR');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
     public function integer(string $name): Column {
         $column = new Column($name);
         $column->type('INT');
@@ -32,9 +39,30 @@ class Table
         return $column;
     }
 
+    public function bigInt(string $name): Column {
+        $column = new Column($name);
+        $column->type('BIGINT');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
+    public function tinyInt(string $name): Column {
+        $column = new Column($name);
+        $column->type('TINYINT');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
     public function float(string $name): Column {
         $column = new Column($name);
         $column->type('FLOAT');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
+    public function double(string $name): Column {
+        $column = new Column($name);
+        $column->type('DOUBLE');
         $this->collumns[] = $column;
         return $column;
     }
@@ -87,6 +115,32 @@ class Table
         $this->collumns[] = $column;
         $column = new Column('updated_at');
         $column->type('TIMESTAMPTZ')->nullable()->default("CURRENT_TIMESTAMP");
+        $this->collumns[] = $column;
+    }
+
+    public function text(string $name): Column {
+        $column = new Column($name);
+        $column->type('TEXT');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
+    public function enum(string $name, array $values): Column {
+        $column = new Column($name);
+        $column->type('ENUM(' . implode(',', $values) . ')');
+        $this->collumns[] = $column;
+        return $column;
+    }
+
+    public function rememberToken(string $name = 'remember_token'): void {
+        $column = new Column($name);
+        $column->type('string')->nullable();
+        $this->collumns[] = $column;
+    }
+
+    public function softDelete(string $name = 'deleted_at'): void {
+        $column = new Column($name);
+        $column->type('TIMESTAMP')->nullable();
         $this->collumns[] = $column;
     }
 }
