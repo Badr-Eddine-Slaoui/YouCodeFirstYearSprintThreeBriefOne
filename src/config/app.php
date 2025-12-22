@@ -106,9 +106,14 @@ function parseMavel(string $content) {
         $content
     );
 
-    //echo strings
     $content = preg_replace(
-        "/{{ (.+?) }}/",
+        "/@error\(['\"](.+?)['\"]\)\s*(.*?)\s*@enderror/s",
+        "<?php if (session()->hasError('$1')) : ?>\n<?php \$message = session()->getError('$1'); ?>\n$2\n<?php endif; ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/{{\s*(.+?)\s*}}/",
         "<?php echo $1; ?>",
         $content
     );
