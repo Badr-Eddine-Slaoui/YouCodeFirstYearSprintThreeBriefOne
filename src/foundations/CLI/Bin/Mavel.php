@@ -315,10 +315,32 @@ class Mavel {
     private function displayHelpMenue(): void {
         echo "Usage: mavel <command> <name>\n";
         echo "Commands:\n";
-        echo "  help\n";
-        echo "  build/controller\n";
+        echo "  help : Displays this help menue\n";
+        echo "  build/controller : Builds a controller\n";
         echo "      OPTIONS:\n";
-        echo "          -r, --resource\n";
+        echo "          -r, --resource : Builds a resource controller\n";
+        echo "          -m, --model : Builds a model\n";
+        echo "          -mg, --migration : Builds a migration\n";
+        echo "          -rs, --request : Builds a request\n";
+        echo "  build/model : Builds a model\n";
+        echo "      OPTIONS:\n";
+        echo "          -c, --controller : Builds a controller\n";
+        echo "          -r, --resource : Builds a resource controller (Must be used with -c)\n";
+        echo "          -mg, --migration : Builds a migration\n";
+        echo "          -rs, --request : Builds a request\n";
+        echo "  build/request : Builds a request\n";
+        echo "      OPTIONS:\n";
+        echo "          -c, --controller : Builds a controller\n";
+        echo "          -r, --resource : Builds a resource controller (Must be used with -c)\n";
+        echo "          -mg, --migration : Builds a migration\n";
+        echo "          -m, --model : Builds a model\n";
+        echo "  build/middleware : Builds a middleware\n";
+        echo "  build/migration : Builds a migration\n";
+        echo "  migrate : Runs migrations\n";
+        echo "  migrate/down : Rolls back all migrations\n";
+        echo "  migrate/rollback : Rolls back last migration\n";
+        echo "  migrate/refresh : Rolls back and runs migrations (refresh database)\n";
+        exit(1);
     }
 
     private function buildFile(string $name, string $postfix): void {
