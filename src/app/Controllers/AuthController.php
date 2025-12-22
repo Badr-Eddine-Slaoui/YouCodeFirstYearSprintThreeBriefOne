@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Request\LoginRequest;
+use App\Requests\LoginRequest;
 use Foundations\Controllers\Controller;
 use Foundations\Helpers\Auth;
 use Foundations\Request\Request;
