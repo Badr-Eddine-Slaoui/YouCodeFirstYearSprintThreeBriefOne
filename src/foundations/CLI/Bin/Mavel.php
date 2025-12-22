@@ -2,6 +2,7 @@
 
 namespace Foundations\CLI\Bin;
 
+use Foundations\DB\GoldDigger\Model;
 use Foundations\DB\Migrations\Migrator;
 
 define('ROOT_DIR', __DIR__ .'/../../..');
@@ -30,6 +31,31 @@ class Mavel {
                 if ($arg === '--controller') {
                     $this->options['controller'] = true;
                 }
+                if ($arg === '-m') {
+                    $this->options['m'] = true;
+                }
+                if ($arg === '--model') {
+                    $this->options['model'] = true;
+                }
+                if ($arg === '-mg') {
+                    $this->options['mg'] = true;
+                }
+                if ($arg === '--migration') {
+                    $this->options['migration'] = true;
+                }
+                if ($arg === '-rs') {
+                    $this->options['rs'] = true;
+                }
+                if ($arg === '--request') {
+                    $this->options['request'] = true;
+                }
+                if ($arg === '-a') {
+                    $this->options['a'] = true;
+                }
+                if ($arg === '--all') {
+                    $this->options['all'] = true;
+                }
+
                 continue;
             }
             $this->argv[] = $arg;
@@ -57,6 +83,9 @@ class Mavel {
                 $name = $this->getName("controller");
 
                 $optR = isset($this->options['r']) || isset($this->options['resource']);
+                $optM = isset($this->options['m']) || isset($this->options['model']);
+                $optRs = isset($this->options['rs']) || isset($this->options['request']);
+                $optMg = isset($this->options['mg']) || isset($this->options['migration']);
 
                 $this->validateName($name, 'controller');
 
@@ -66,6 +95,24 @@ class Mavel {
                     $this->buildFile($name,"Controller");
                 }
 
+                if ($optRs) {
+                    $name = $this->getName("Request");
+                    $this->validateName($name, "Request");
+                    $this->buildFormRequest($name);
+                }
+
+                if ($optM) {
+                    $name = $this->getName("Model");
+                    $this->validateName($name, "Model");
+                    $this->buildModel($name);
+                }
+
+                if ($optMg) {
+                    $name = "create_" . Model::pluralize(strtolower($this->getName("Migration"))) . "_table";
+                    $this->validateMigrationName($name); 
+                    $this->buildMigration( $name , date("Y_m_d_His"));
+                }
+
                 break;
             }
             case 'build/model':{
@@ -73,6 +120,8 @@ class Mavel {
 
                 $optC = isset($this->options['c']) || isset($this->options['controller']);
                 $optR = isset($this->options['r']) || isset($this->options['resource']);
+                $optRs = isset($this->options['rs']) || isset($this->options['request']);
+                $optMg = isset($this->options['mg']) || isset($this->options['migration']);
 
                 $this->validateName($name, 'Model');
 
@@ -90,14 +139,53 @@ class Mavel {
 
                 $this->buildModel($name);
 
+                if ($optRs) {
+                    $name = $this->getName("Request");
+                    $this->validateName($name, "Request");
+                    $this->buildFormRequest($name);
+                }
+
+                if ($optMg) {
+                    $name = "create_" . Model::pluralize(strtolower($this->getName("Migration"))) . "_table";
+                    $this->validateMigrationName($name); 
+                    $this->buildMigration( $name , date("Y_m_d_His"));
+                }
+
                 break;
             }
             case 'build/request':{
                 $name = $this->getName("Request");
 
+                $optC = isset($this->options['c']) || isset($this->options['controller']);
+                $optR = isset($this->options['r']) || isset($this->options['resource']);
+                $optM = isset($this->options['m']) || isset($this->options['model']);
+                $optMg = isset($this->options['mg']) || isset($this->options['migration']);
+
                 $this->validateName($name, 'Request');
 
                 $this->buildFormRequest($name);
+
+                if ($optC) {
+                    $name = $this->getName('Controller');
+                    $this->validateName($name, 'Controller');
+                    if ($optR) {
+                        $this->buildFile($name, "ResourceController");
+                    } else {
+                        $this->buildFile($name,"Controller");
+                    }
+                }
+
+                if ($optM) {
+                    $name = $this->getName("Model");
+                    $this->validateName($name, "Model");
+                    $this->buildModel($name);
+                }
+
+                if ($optMg) {
+                    $name = "create_" . Model::pluralize(strtolower($this->getName("Migration"))) . "_table";
+                    $this->validateMigrationName($name); 
+                    $this->buildMigration( $name , date("Y_m_d_His"));
+                }
 
                 break;
             }
