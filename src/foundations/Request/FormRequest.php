@@ -90,4 +90,16 @@ abstract class FormRequest extends Request {
         }
     }
 
+    public static function validateAttribute(string $attribute, $value, array $rules): bool {
+        foreach ($rules as $rule) {
+            if (is_string($rule)) {
+                if (!static::validateRule($rule, $value)) {
+                    static::setError($attribute, $rule);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 }
