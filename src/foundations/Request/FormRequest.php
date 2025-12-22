@@ -45,4 +45,49 @@ abstract class FormRequest extends Request {
         }
     }
 
+    public static function setError(string $attribute, string $rule) {
+        $fullRule = $rule;
+        
+        if(str_contains($rule,':')) {
+            $rule = explode(':', $rule)[0];
+        }
+
+        if (isset(static::$messages["$attribute.$rule"])) {
+            static::$errors[$attribute] = static::$messages["$attribute.$rule"];
+        } else {
+            $message = match($rule) {
+                "required" => "$attribute is required",
+                "email" => "Email is invalid",
+                "string" => "$attribute must be a string",
+                "int" => "$attribute must be an integer",
+                "min" => function () use ($attribute, $fullRule) {
+                    $min = explode(':', $fullRule)[1];
+                    return "$attribute must be at least $min characters";
+                },
+                "max" => function () use ($attribute, $fullRule) {
+                    $max = explode(":", $fullRule)[1];
+                    return "$attribute must be at most $max characters";
+                },
+                "between" => function () use ($attribute, $fullRule) {
+                    $range = explode(":", $fullRule)[1];
+                    $min = explode(",", $range)[0];
+                    $max = explode(",", $range)[1];
+                    return "$attribute must be between $min and $max characters";
+                },
+                "in" => function () use ($attribute, $fullRule) {
+                    $enum = explode(":", $fullRule)[1];
+                    $enum = implode(", ", explode(",", $enum));
+                    return "$attribute must be one of $enum";
+                },
+                default => "$attribute is invalid",
+            };
+
+            if(!is_string($message)){
+                static::$errors[$attribute] = $message();
+            }else{
+                static::$errors[$attribute] = $message;
+            }
+        }
+    }
+
 }
