@@ -102,4 +102,23 @@ abstract class FormRequest extends Request {
         return true;
     }
 
+    public static function validate(Request $request): void {
+        $attributes = array_keys(self::$rules);
+
+        foreach ($attributes as $attribute) {
+            $value = $request->input($attribute);
+
+            $attributeRules = explode('|', self::$rules[$attribute]);
+            
+            static::validateAttribute($attribute, $value, $attributeRules);
+
+        }
+
+        if (!empty(static::$errors)) {
+            Session::flash('errors', static::$errors);
+            header('Location: ' . $request->header("HTTP_REFERER"));
+            exit();
+        }
+    }
+
 }
