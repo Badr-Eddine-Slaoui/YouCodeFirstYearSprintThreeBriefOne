@@ -10,11 +10,21 @@ class QueryBuilder{
     protected string $model;
     protected string $table;
     protected array $selects = [];
+    protected ?array $count = [];
+    protected ?array $avg = [];
+    protected ?array $sum = [];
+    protected ?array $min = [];
+    protected ?array $max = [];
     protected array $wheres = [];
     protected array $orWheres = [];
     protected array $toUpdate = [];
     protected bool $toDelete = false;
     protected array $joins = [];
+    protected array $orders = [];
+    protected array $groups = [];
+    protected array $havings = [];
+    protected array $orHavings = [];
+    protected ?int $offset = null;
     protected ?int $limit = null;
 
     public function __construct(string $model)
@@ -72,27 +82,96 @@ class QueryBuilder{
         return count($this->selects) > 0 ? $this->selects : ['*' => null];
     }
 
-    public function where(string|array $column, $value = null): self
+    public function count(?string $column = null, ?string $alias = null): self
     {
-        if (is_string($column)) {
-            if (isset($value)) {
-                $this->wheres[$column] = $value;
-            }
-        } else {
-            $this->wheres = array_merge($this->wheres, $column);
+        if(isset($column)){
+            $this->count[$column] = $alias;
+        }else{
+            $this->count["*"] = $alias;
         }
         return $this;
     }
 
-    public function orWhere(string|array $column, $value = null): self
+    public function avg(string $column, ?string $alias = null): self
     {
-        if (is_string($column)) {
-            if (isset($value)) {
-                $this->orWheres[$column] = $value;
-            }
-        } else {
-            $this->orWheres = array_merge($this->orWheres, $column);
-        }
+        $this->avg[$column] = $alias;
+
+        return $this;
+    }
+
+    public function sum(string $column, ?string $alias = null): self
+    {
+        $this->sum[$column] = $alias;
+        
+        return $this;
+    }
+
+    public function min(string $column, ?string $alias = null): self
+    {
+        $this->min[$column] = $alias;
+
+        return $this;
+    }
+
+    public function max(string $column, ?string $alias = null): self
+    {
+        $this->max[$column] = $alias;
+
+        return $this;
+    }
+
+    public function orderBy(string $column, string $order = "ASC"): self
+    {
+        $this->orders[$column] = $order;
+
+        return $this;
+    }
+
+    public function groupBy(string $column, string $order = "ASC"): self
+    {
+        $this->groups[$column] = $order;
+
+        return $this;
+    }
+
+    public function offset(int $offset): self
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    public function limit(int $limit): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function where(string $column, string $operator, $value): self
+    {
+        $this->wheres[$column] = [$operator, $value];
+        return $this;
+    }
+
+    public function orWhere(string $column , string $operator, $value): self
+    {
+        $this->wheres[$column] = [$operator, $value];
+
+        return $this;
+    }
+
+    public function having(string $column, string $operator, $value): self
+    {
+        $this->havings[$column] = [$operator, $value];
+
+        return $this;
+    }
+
+    public function orHaving(string $column, string $operator, $value): self
+    {
+        $this->orHavings[$column] = [$operator, $value];
+
         return $this;
     }
 
@@ -100,18 +179,26 @@ class QueryBuilder{
     {
         $this->limit = 1;
 
-        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
-        $row = $this->execute($sql, array_values(array_merge($this->wheres, $this->orWheres, [$this->limit])));
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->count, $this->avg, $this->sum, $this->min, $this->max, $this->joins, $this->wheres, $this->orWheres, $this->groups, $this->havings, $this->orHavings, $this->orders, $this->offset, $this->limit);
+        $row = $this->executeAll($sql, $this->bindings());
 
         return $row ? new $this->model($row) : null;
     }
 
     public function last(): ?Model
     {
-        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
-        $row = $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres, [$this->limit])));
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->count, $this->avg, $this->sum, $this->min, $this->max, $this->joins, $this->wheres, $this->orWheres, $this->groups, $this->havings, $this->orHavings, $this->orders, $this->offset, $this->limit);
+        $row = $this->executeAll($sql, $this->bindings());
 
         return $row ? new $this->model($row) : null;
+    }
+
+    private function flaten($array){
+        return array_merge(array_map(fn($item) => $item[1], array_values($array)));
+    }
+
+    private function bindings(){
+        return array_values(array_merge($this->flaten($this->wheres), $this->flaten($this->orWheres), $this->flaten($this->havings), $this->flaten($this->orHavings), $this->offset ? [$this->offset] : [], $this->limit ? [$this->limit] : []));
     }
 
     public function get(): array
@@ -125,8 +212,8 @@ class QueryBuilder{
             }
         }
 
-        $sql = $this->grammar()->select($this->table, $this->selects(), $this->wheres, $this->orWheres, $this->limit);
-        $rows = $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres, $this->limit ? [$this->limit] : [])));
+        $sql = $this->grammar()->select($this->table, $this->selects(), $this->count, $this->avg, $this->sum, $this->min, $this->max, $this->joins, $this->wheres, $this->orWheres, $this->groups, $this->havings, $this->orHavings, $this->orders, $this->offset, $this->limit);
+        $rows = $this->executeAll($sql, $this->bindings());
 
         if(isset($this->toDelete)){
             if($this->toDelete){
@@ -158,6 +245,21 @@ class QueryBuilder{
 
     public function delete(): static{
         $this->toDelete = true;
+        return $this;
+    }
+
+    public function join(string $table, string $first, string $operator, string $second): static{
+        $this->joins[] = ["INNER", $table, $first, $operator, $second];
+        return $this;
+    }
+
+    public function leftJoin(string $table, string $first, string $operator, string $second): static{
+        $this->joins[] = ["LEFT", $table, $first, $operator, $second];
+        return $this;
+    }
+
+    public function rightJoin(string $table, string $first, string $operator, string $second): static{
+        $this->joins[] = ["RIGHT", $table, $first, $operator, $second];
         return $this;
     }
 }
