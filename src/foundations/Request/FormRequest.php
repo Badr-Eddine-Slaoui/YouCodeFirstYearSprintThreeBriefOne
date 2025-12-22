@@ -16,4 +16,8 @@ abstract class FormRequest extends Request {
 
     abstract public static function messages(): array;
 
+    public static function request(): Request{
+        return new Request();
+    }
+
 }
