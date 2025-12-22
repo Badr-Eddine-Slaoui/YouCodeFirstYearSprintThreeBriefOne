@@ -5,51 +5,163 @@ namespace Foundations\DB\Grammars;
 use Foundations\DB\Migrations\Column;
 
 class PostgresGrammar extends Grammar{
-    public function select(string $table, array $columns, array $wheres = [], array $orWheres = [], ?int $limit = null): string
+    public function select(string $table, array $columns, array $counts = [], array $avg = [], array $sum = [], array $min = [], array $max = [], array $joins = [], array $wheres = [], array $orWheres = [], array $groups = [], array $havings = [], array $orHavings = [], array $orders = [], ?int $offset = null, ?int $limit = null): string
     {
         $selects = "";
 
-        foreach ($columns as $key => $value) {
-            if (!isset($value)) {
-                $selects .= "{$key}, ";
-            } else {
-                $selects .= "{$key} AS {$value}, ";
+        if(count($columns) > 0){
+            foreach ($columns as $key => $value) {
+                if (!isset($value)) {
+                    $selects .= "{$key}, ";
+                } else {
+                    $selects .= "{$key} AS {$value}, ";
+                }
             }
         }
 
-        $sql = 'SELECT ' . substr($selects, 0, -2) . " FROM {$table}";
+        $countsColumns = "";
+
+        if(count($counts) > 0){
+            foreach ($counts as $key => $value) {
+                if (!isset($value)) {
+                    $countsColumns .= "COUNT({$key}), ";
+                } else {
+                    $countsColumns .= "COUNT({$key}) AS {$value}, ";
+                }
+            }
+        }
+
+        $avgColumns = "";
+
+        if(count($avg) > 0){
+            foreach ($avg as $key => $value) {
+                if (!isset($value)) {
+                    $avgColumns .= "AVG({$key}), ";
+                } else {
+                    $avgColumns .= "AVG({$key}) AS {$value}, ";
+                }
+            }
+        }
+
+        $sumColumns = "";
+
+        if(count($sum) > 0){
+            foreach ($sum as $key => $value) {
+                if (!isset($value)) {
+                    $sumColumns .= "SUM({$key}), ";
+                } else {
+                    $sumColumns .= "SUM({$key}) AS {$value}, ";
+                }
+            }
+        }
+
+        $minColumns = "";
+
+        if(count($min) > 0) {
+            foreach ($min as $key => $value) {
+                if (!isset($value)) {
+                    $minColumns .= "MIN({$key}), ";
+                } else {
+                    $minColumns .= "MIN({$key}) AS {$value}, ";
+                }
+            }
+        }
+
+        $maxColumns = "";
+
+        if(count($max) > 0) {
+            foreach ($max as $key => $value) {
+                if (!isset($value)) {
+                    $maxColumns .= "MAX({$key}), ";
+                } else {
+                    $maxColumns .= "MAX({$key}) AS {$value}, ";
+                }
+            }
+        }
+
+        $allcolumns = $selects . $countsColumns . $avgColumns . $sumColumns . $minColumns . $maxColumns;
+
+        $sql = 'SELECT ' . rtrim($allcolumns, ', ') . " FROM {$table}";
+
+        $joinsStr = "";
+
+        if(count($joins) > 0) {
+            foreach ($joins as $join) {
+                $joinsStr .= " {$join[0]} JOIN {$join[1]} ON {$join[2]} {$join[3]} {$join[4]}";
+            }
+        }
+
+        $sql .= $joinsStr;
 
         if (count($wheres) > 0) {
-            $conditions = implode(' AND ', array_map(
-                fn($col) => "{$col} = ?",
-                array_keys($wheres)
-            ));
-            
-            if (str_contains($sql,"WHERE")) {
-                $sql .= " AND {$conditions}";
-            } else {
-                $sql .= " WHERE {$conditions}";
+            foreach ($wheres as $column => $where) {
+                if (str_contains($sql,"WHERE")) {
+                    $sql .= " AND {$column} {$where[0]} ?";
+                } else {
+                    $sql .= " WHERE {$column} {$where[0]} ?";
+                }
             }
         }
 
         if (count($orWheres) > 0) {
-            $conditions = implode(' OR ', array_map(
-                fn($col) => "{$col} = ?",
-                array_keys($orWheres)
-            ));
-
-            if(str_contains($sql,"WHERE")) {
-                $sql .= " OR {$conditions}";
-            } else {
-                $sql .= " WHERE {$conditions}";
+            foreach ($orWheres as $column => $where) {
+                if (str_contains($sql,"WHERE")) {
+                    $sql .= " OR {$column} {$where[0]} ?";
+                } else {
+                    $sql .= " WHERE {$column} {$where[0]} ?";
+                }
             }
+        }
+
+        $groupsStr = " GROUP BY ";
+
+        if (count($groups) > 0) {
+            foreach ($groups as $column => $_) {
+                $groupsStr .= " {$column}, ";
+            }
+        }
+
+        $sql .= rtrim($groupsStr, ", ");
+
+        if (count($havings) > 0) {
+            foreach ($havings as $column => $having) {
+                if (str_contains($sql,"HAVING")) {
+                    $sql .= " AND {$column} {$having[0]} ?";
+                } else {
+                    $sql .= " HAVING {$column} {$having[0]} ?";
+                }
+            }
+        }
+
+        if (count($orHavings) > 0) {
+            foreach ($orHavings as $column => $having) {
+                if (str_contains($sql,"HAVING")) {
+                    $sql .= " OR {$column} {$having[0]} ?";
+                } else {
+                    $sql .= " HAVING {$column} {$having[0]} ?";
+                }
+            }
+        }
+
+        $ordersStr = " ORDER BY ";
+
+        if (count($orders) > 0) {
+            foreach ($orders as $column => $order) {
+                $ordersStr .= " {$column} {$order}, ";
+            }
+        }
+
+        $sql .= rtrim($ordersStr, ", ");
+
+        if ($offset) {
+            $sql .= " OFFSET ?";
         }
 
         if ($limit) {
             $sql .= " LIMIT ?";
         }
 
-        return $sql;
+        return "$sql;";
     }
 
     public function insert(string $table, array $data): string

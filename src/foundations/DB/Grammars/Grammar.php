@@ -5,7 +5,7 @@ namespace Foundations\DB\Grammars;
 use Foundations\DB\Migrations\Column;
 
 abstract class Grammar {
-    abstract public function select(string $table, array $columns, array $wheres = [], array $orWheres = [], ?int $limit = null): string;
+    abstract public function select(string $table, array $columns, array $counts = [], array $avg = [], array $sum = [], array $min = [], array $max = [], array $joins = [], array $wheres = [], array $orWheres = [], array $groups = [], array $havings = [], array $orHavings = [], array $orders = [], ?int $offset = null, ?int $limit = null): string;
 
     abstract public function insert(string $table, array $data): string;
 
