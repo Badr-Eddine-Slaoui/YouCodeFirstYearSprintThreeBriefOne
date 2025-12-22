@@ -33,7 +33,7 @@ services:
       - pgtables:/var/lib/postgresql/data
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:snapshot
     container_name: pgadmin
     restart: always
     environment:
