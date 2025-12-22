@@ -121,4 +121,11 @@ abstract class FormRequest extends Request {
         }
     }
 
+    public static function handleValidationErrors() {
+        self::$rules = static::rules();
+        self::$messages = static::messages();
+        $request = static::request();
+        static::validate($request);
+    }
+
 }
