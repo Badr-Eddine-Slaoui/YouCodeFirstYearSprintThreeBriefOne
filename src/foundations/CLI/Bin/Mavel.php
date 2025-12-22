@@ -321,6 +321,33 @@ class Mavel {
         echo "Middleware created: $filePath\n";
     }
 
+    private function buildFormRequest(string $name): void {
+
+        $template =  __DIR__ . '/../templates/FormRequestTemplate.php';
+        $dir = APP_DIR . '/Requests';
+        $filePath = "./app/Requests/$name.php";
+
+        if (!\is_dir($dir)) \mkdir($dir, 0777, true);
+
+        \chmod($dir, 0777);
+
+        $file = "$dir/$name.php";
+        
+        if (\file_exists($file)) {
+            echo "Request already exists: $filePath\n";
+            return;
+        }
+
+        $content = \file_get_contents($template);
+
+        $content = \str_replace("FormRequestName", $name, $content);
+
+        \file_put_contents($file, $content);
+        \chmod($file, 0777);
+
+        echo "Request created: $filePath\n";
+    }
+
     private function buildMigration(string $name, string $date): void {
 
         $template =  __DIR__ . '/../templates/Migration.php';
