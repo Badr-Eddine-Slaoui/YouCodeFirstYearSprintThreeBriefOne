@@ -68,6 +68,27 @@ class Session{
         return isset($_SESSION[$key]) || isset($_SESSION["_flash"][$key]);
     }
 
+    public static function hasError($key){
+        static::start();
+        return isset($_SESSION["_flash"]['errors'][$key]);
+    }
+
+    public static function getError($key, $default = null){
+        static::start();
+        if (!isset($_SESSION['_flash']['errors'][$key])) {
+            return $default;
+        }
+
+        $value = $_SESSION['_flash']['errors'][$key];
+        unset($_SESSION['_flash']['errors'][$key]);
+
+        if (empty($_SESSION['_flash']['errors'])) {
+            unset($_SESSION['_flash']['errors']);
+        }
+
+        return $value;
+    }
+
     public static function forget(){
         static::start();
         $_SESSION = [];
