@@ -129,13 +129,7 @@ class Router {
 
         global $container;
 
-        foreach($route["middleware"] as $middleware){
-            Kernel::setMiddleware($middleware);
-        }
-
-        Kernel::handle(new Request(), function() use ($container, $controller, $action, $params) {
-            $container->call([$controller, $action], $params);
-        });
+        $container->call([$controller, $action], $params);
 
         return true;
     }
@@ -148,7 +142,21 @@ class Router {
             $pathArr = explode('/', $route['path']);
             $requestPathArr = explode('/', $requestPath);
 
-            if (count($pathArr) !== count($requestPathArr) || $requestMethod !== $route['method'] || !$this->match($requestPathArr, $pathArr, $route)) {
+            if (count($pathArr) !== count($requestPathArr) || $requestMethod !== $route['method']) {
+                continue;
+            }
+
+            foreach($route["middleware"] as $middleware){
+                Kernel::setMiddleware($middleware);
+            }
+
+            $isMatched = false;
+
+            Kernel::handle(new Request(), function() use ($requestPathArr, $pathArr, $route, &$isMatched) {
+                $isMatched = $this->match($requestPathArr, $pathArr, $route);
+            });
+
+            if (!$isMatched) {
                 continue;
             }
 
