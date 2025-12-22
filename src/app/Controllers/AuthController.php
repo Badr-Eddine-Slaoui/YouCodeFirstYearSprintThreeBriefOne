@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Request\LoginRequest;
 use Foundations\Controllers\Controller;
 use Foundations\Helpers\Auth;
 use Foundations\Request\Request;
@@ -24,7 +25,7 @@ class AuthController extends Controller {
         }
     }
 
-    public function loginSubmit(Request $request) {
+    public function loginSubmit(LoginRequest $request) {
         if(Auth::login($request->email, $request->password)) {
             redirect("index");
         } else {

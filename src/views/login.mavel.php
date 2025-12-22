@@ -22,6 +22,9 @@
                     type="email"
                     class="form-input w-full px-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-300 focus:ring-0"
                     placeholder="you@example.com">
+                @error('email') 
+                    <p class="text-red-500 text-xs my-5">{{$message}}</p> 
+                @enderror
             </div>
 
             <!-- Password -->
@@ -34,6 +37,9 @@
                     type="password"
                     class="form-input w-full px-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-300 focus:ring-0"
                     placeholder="••••••••">
+                @error('password') 
+                    <p class="text-red-500 text-xs my-5">{{$message}}</p> 
+                @enderror
             </div>
 
             <!-- Forgot password -->
