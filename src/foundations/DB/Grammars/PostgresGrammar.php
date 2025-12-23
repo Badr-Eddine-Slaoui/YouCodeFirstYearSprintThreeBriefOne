@@ -270,7 +270,7 @@ class PostgresGrammar extends Grammar{
     public static function columnToSQL(Column $column): string {
         $column = $column->column;
 
-        $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = null;
+        $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = $references = $onDelete = $onUpdate = null;
 
         if(isset($column["name"])) {
             $name = $column["name"];
@@ -303,13 +303,29 @@ class PostgresGrammar extends Grammar{
             $primary_key = "PRIMARY KEY";
         }
 
+        if(isset($column["references"])) {
+            $references = "REFERENCES {$column["references"]["table"]}({$column["references"]["column"]})";
+        }
+
+        if(isset($column["onDelete"])) {
+            $onDelete = "ON DELETE {$column["onDelete"]}";
+        }
+
+        if(isset($column["onUpdate"])) {
+            $onUpdate = "ON UPDATE {$column["onUpdate"]}";
+        }
+
         if(isset($column["nullable"])) {
             $nullable = $column["nullable"] ? "" : "NOT NULL";
         }else{
             $nullable = "NOT NULL";
         }
+
+        if(str_contains($type,"FOREIGN KEY")) {
+            $name = $default = $nullable = $unique = $auto_increment = $primary_key = null;
+        }
         
-        return "$name $type $size $default $nullable $unique $auto_increment $primary_key,";
+        return "$name $type $size $default $nullable $unique $auto_increment $primary_key $references $onDelete $onUpdate,";
     }
 
     public static function columnToUpdateSQL(string $table, Column $column): string {

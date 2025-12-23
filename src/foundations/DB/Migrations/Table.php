@@ -143,4 +143,11 @@ class Table
         $column->type('TIMESTAMP')->nullable();
         $this->collumns[] = $column;
     }
+
+    public function foreignKey(string $name): Column {
+        $column = new Column($name);
+        $column->type("FOREIGN KEY($name)");
+        $this->collumns[] = $column;
+        return $column;
+    }
 }

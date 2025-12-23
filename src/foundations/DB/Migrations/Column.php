@@ -52,4 +52,19 @@ class Column{
         $this->column["primary_key"] = true;
         return $this;
     }
+
+    public function references(string $table, string $column) : self {
+        $this->column["references"] = ["table" => $table, "column" => $column];
+        return $this;
+    }
+
+    public function onDelete(string $onDelete) : self {
+        $this->column["onDelete"] = $onDelete;
+        return $this;
+    }
+
+    public function onUpdate(string $onUpdate) : self {
+        $this->column["onUpdate"] = $onUpdate;
+        return $this;
+    }
 }
