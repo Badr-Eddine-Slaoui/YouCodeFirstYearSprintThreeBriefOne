@@ -13,7 +13,7 @@ class Model{
         $this->fill($attributes);
     }
 
-    private static function class_basename(string $class): string
+    public static function class_basename(string $class): string
     {
         return basename(str_replace('\\', '/', $class));
     }
