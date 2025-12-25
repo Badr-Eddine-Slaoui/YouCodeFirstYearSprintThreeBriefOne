@@ -130,4 +130,32 @@ class Model{
         }
         return $query->last() ?? static::create($attributes);
     }
+
+    public function belongsTo($related, $foreignKey = null, $localKey = 'id'){
+        return new BelongsTo($related, $this, $localKey, $foreignKey ?? strtolower(Model::class_basename($related)) . '_id');
+    }
+
+    public function belongsToMany($related, $pivot_table = null, $localKey = 'id', $foreignKey = null, $relatedLocalKey = 'id', $relatedForeignKey = null){
+        //Role::class, 'role_user', 'user_id', 'role_id'
+        $relatedClassName = strtolower(Model::class_basename($related));
+        $parrentClassName = strtolower(Model::class_basename($this::class));
+        if(is_null($pivot_table)){
+            $modelNamesArr = [$relatedClassName, $parrentClassName];
+            sort($modelNamesArr);
+            $pivot_table = implode('_', $modelNamesArr);
+        }
+
+        $foreignKey ??= $parrentClassName . '_id';
+        $relatedForeignKey ??= $relatedClassName . '_id';
+        
+        return new BelongsToMany($related, $pivot_table, $this, $localKey, $foreignKey, $relatedLocalKey, $relatedForeignKey);
+    }
+
+    public function hasOne($related, $foreignKey = null, $localKey = 'id'){
+        return new HasOne($related, $this, $localKey, $foreignKey ?? strtolower(Model::class_basename($related)) . '_id');
+    }
+
+    public function hasMany($related, $foreignKey = null, $localKey = 'id'){
+        return new HasMany($related, $this, $localKey, $foreignKey);
+    }
 }
