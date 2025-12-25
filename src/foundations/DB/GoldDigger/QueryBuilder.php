@@ -181,7 +181,7 @@ class QueryBuilder{
         $this->limit = 1;
 
         $sql = $this->grammar()->select($this->table, $this->selects(), $this->count, $this->avg, $this->sum, $this->min, $this->max, $this->joins, $this->wheres, $this->orWheres, $this->groups, $this->havings, $this->orHavings, $this->orders, $this->offset, $this->limit);
-        $row = $this->executeAll($sql, $this->bindings());
+        $row = $this->execute($sql, $this->bindings());
 
         return $row ? new $this->model($row) : null;
     }
@@ -189,7 +189,7 @@ class QueryBuilder{
     public function last(): ?Model
     {
         $sql = $this->grammar()->select($this->table, $this->selects(), $this->count, $this->avg, $this->sum, $this->min, $this->max, $this->joins, $this->wheres, $this->orWheres, $this->groups, $this->havings, $this->orHavings, $this->orders, $this->offset, $this->limit);
-        $row = $this->executeAll($sql, $this->bindings());
+        $row = $this->execute($sql, $this->bindings());
 
         return $row ? new $this->model($row) : null;
     }
