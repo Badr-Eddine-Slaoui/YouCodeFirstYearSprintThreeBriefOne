@@ -2,6 +2,11 @@
 
 namespace Foundations\DB\GoldDigger;
 
+use Foundations\DB\GoldDigger\Relationships\BelongsTo;
+use Foundations\DB\GoldDigger\Relationships\BelongsToMany;
+use Foundations\DB\GoldDigger\Relationships\HasMany;
+use Foundations\DB\GoldDigger\Relationships\HasOne;
+
 class Model{
     protected static ?string $table = null;
     public array $attributes = [];
@@ -64,6 +69,11 @@ class Model{
     public function __set(string $key, $value): void
     {
         $this->attributes[$key] = $value;
+    }
+    public function load(string $key): self
+    {
+        $this->relationships[$key] = $this->{$key}()->get();
+        return $this;
     }
 
     public static function query(): QueryBuilder
