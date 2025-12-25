@@ -228,7 +228,19 @@ class QueryBuilder{
             }
         }
 
-        return array_map(fn($r) => new $this->model($r), $rows);
+        $models = array_map(fn($r) => new $this->model($r), $rows);
+
+        foreach($models as $model){
+            if(count($this->eagerLoading) > 0){
+                foreach($this->eagerLoading as $relation){
+                    if(!isset($model->relationships[$relation])){
+                        $model->relationships[$relation] = $model->$relation()->get();
+                    }
+                }
+            }
+        }
+
+        return $models;
     }
 
     public function save(Model $model): void
