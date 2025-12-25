@@ -15,11 +15,10 @@
         <h2 class="text-3xl font-bold mb-6 text-center">Debug</h2>
         <p class="text-gray-700 text-lg leading-8 text-center max-w-3xl mx-auto">
             <?php 
-                foreach($var as $key => $value){
-                    echo  
-                        gettype($value) . ' => ' . 
-                        var_export($value, true)
-                    . '<br>';
+                foreach($vars as $var){
+                    echo "<pre>";
+                        var_dump($var);
+                    echo "</pre>";
                 }
             ?>
         </p>

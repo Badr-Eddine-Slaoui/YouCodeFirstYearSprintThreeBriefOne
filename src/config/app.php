@@ -236,7 +236,7 @@ function abort(int $code, string $message): never {
     }
 }
 
-function dd(mixed ...$var): never {
+function dd(mixed ...$vars): never {
     try {
         require_once  BASE_VIEWS_DIR . "/Exceptions/dd.php";
         exit();
