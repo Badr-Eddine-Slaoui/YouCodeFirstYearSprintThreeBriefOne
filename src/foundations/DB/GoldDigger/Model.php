@@ -45,7 +45,20 @@ class Model{
 
     public function __get(string $key)
     {
-        return $this->attributes[$key] ?? null;
+        if (isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+
+        if (isset($this->relationships[$key])) {
+            return $this->relationships[$key];
+        }
+
+        if (method_exists($this, $key)) {
+            $this->relationships[$key] = $this->{$key}()->get();
+            return $this->relationships[$key];
+        }
+
+        return null;
     }
 
     public function __set(string $key, $value): void
