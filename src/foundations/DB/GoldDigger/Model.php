@@ -6,6 +6,8 @@ class Model{
     protected static ?string $table = null;
     public array $attributes = [];
 
+    public array $relationships = [];
+
     public function __construct(array $attributes = [])
     {
         $this->fill($attributes);
