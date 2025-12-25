@@ -87,6 +87,10 @@ class Model{
         return $query->get();
     }
 
+    public static function all(){
+        return static::query()->get();
+    }
+
     public static function find(int $id): ?static
     {
         return static::query()->where('id', "=", $id)->first();
