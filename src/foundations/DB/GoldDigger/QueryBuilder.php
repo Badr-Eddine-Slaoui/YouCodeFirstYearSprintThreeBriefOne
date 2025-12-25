@@ -26,6 +26,7 @@ class QueryBuilder{
     protected array $orHavings = [];
     protected ?int $offset = null;
     protected ?int $limit = null;
+    protected array $eagerLoading = [];
 
     public function __construct(string $model)
     {
