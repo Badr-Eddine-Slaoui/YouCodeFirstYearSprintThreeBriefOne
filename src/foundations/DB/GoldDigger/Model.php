@@ -70,6 +70,14 @@ class Model{
     {
         $this->attributes[$key] = $value;
     }
+
+    public function __debugInfo(): array
+    {
+        return array_merge(
+            $this->attributes,
+            $this->relationships ?: []
+        );
+    }
     
     public function load(string $key): self
     {
