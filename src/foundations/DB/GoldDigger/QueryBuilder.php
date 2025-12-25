@@ -202,6 +202,11 @@ class QueryBuilder{
         return array_values(array_merge($this->flaten($this->wheres), $this->flaten($this->orWheres), $this->flaten($this->havings), $this->flaten($this->orHavings), $this->offset ? [$this->offset] : [], $this->limit ? [$this->limit] : []));
     }
 
+    public function with(string $relation): static{
+        $this->eagerLoading[] = $relation;
+        return $this;
+    }
+
     public function get(): array
     {
         if(isset($this->toUpdate)){

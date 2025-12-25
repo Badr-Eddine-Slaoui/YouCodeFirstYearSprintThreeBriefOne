@@ -70,10 +70,15 @@ class Model{
     {
         $this->attributes[$key] = $value;
     }
+    
     public function load(string $key): self
     {
         $this->relationships[$key] = $this->{$key}()->get();
         return $this;
+    }
+
+    public static function with(string $key): QueryBuilder{
+        return static::query()->with($key);
     }
 
     public static function query(): QueryBuilder
