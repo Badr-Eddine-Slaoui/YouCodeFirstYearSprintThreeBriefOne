@@ -113,9 +113,10 @@ class PostgresGrammar extends Grammar{
             }
         }
 
-        $groupsStr = " GROUP BY ";
+        $groupsStr = "";
 
         if (count($groups) > 0) {
+            $groupsStr .= " GROUP BY ";
             foreach ($groups as $column => $_) {
                 $groupsStr .= " {$column}, ";
             }
@@ -143,9 +144,10 @@ class PostgresGrammar extends Grammar{
             }
         }
 
-        $ordersStr = " ORDER BY ";
+        $ordersStr = "";
 
         if (count($orders) > 0) {
+            $ordersStr .= " ORDER BY ";
             foreach ($orders as $column => $order) {
                 $ordersStr .= " {$column} {$order}, ";
             }
