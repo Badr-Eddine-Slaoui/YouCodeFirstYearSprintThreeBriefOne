@@ -16,11 +16,28 @@ abstract class Migration {
 
         $sql = PostgresGrammar::createTableSQL($name, $table->get_columns());
 
+        $queries = explode(";", $sql);
+        array_pop($queries);
+
         $db = new Database();
 
-        $db->query($sql);
+        try{
+            $db->beginTransaction();
 
-        $db = null;
+            foreach($queries as $query) {
+                $db->query("$query;");
+            }
+
+            $db->commit();
+
+        }catch(\Exception $e){
+
+            $db->rollBack();
+            throw $e;
+            
+        }finally{
+            $db = null;
+        }
     }
 
     protected function dropIfExists(string $name): void {

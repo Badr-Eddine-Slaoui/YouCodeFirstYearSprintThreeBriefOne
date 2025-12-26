@@ -255,9 +255,23 @@ class PostgresGrammar extends Grammar{
         return "SELECT * FROM information_schema.columns WHERE table_name = '$table' AND column_name = '$column'";
     }
 
+    public static function checkEnumsAndGetSQL(string $table, array $columns): string {
+        $sql = "";
+        foreach ($columns as $column) {
+            $columnArr = $column->column;
+            if (str_contains($columnArr["type"], "ENUM")) {
+                $sql .= "CREATE TYPE {$table}_{$columnArr["name"]} AS {$columnArr["type"]};";
+                $column->type("{$table}_{$columnArr["name"]}");
+            }
+        }
+        return $sql;
+    }
+
     public static function createTableSQL(string $table, array $columns): string {
-        $sql = self::compileColumns($columns);
-        return "CREATE TABLE IF NOT EXISTS $table ($sql);";
+        $sql = self::checkEnumsAndGetSQL($table, $columns) ?: "";
+        $columnsSQL = self::compileColumns($columns);
+        $sql .= " CREATE TABLE IF NOT EXISTS $table ($columnsSQL);";
+        return $sql;
     }
 
     public static function compileColumns(array $columns): string {
@@ -273,6 +287,7 @@ class PostgresGrammar extends Grammar{
         $column = $column->column;
 
         $name = $type = $size = $default = $nullable = $unique = $auto_increment = $primary_key = $references = $onDelete = $onUpdate = null;
+        $enum = false;
 
         if(isset($column["name"])) {
             $name = $column["name"];
@@ -289,8 +304,12 @@ class PostgresGrammar extends Grammar{
             }
         }
 
+        if(isset($column["enum"])) {
+            $enum = $column["enum"];
+        }
+
         if(isset($column["default"])) {
-            $default = $column["type"] == "string" ? "DEFAULT '{$column["default"]}'" : "DEFAULT {$column["default"]}";
+            $default = $column["type"] == "string" || $enum ? "DEFAULT '{$column["default"]}'" : "DEFAULT {$column["default"]}";
         }
 
         if(isset($column["unique"])) {

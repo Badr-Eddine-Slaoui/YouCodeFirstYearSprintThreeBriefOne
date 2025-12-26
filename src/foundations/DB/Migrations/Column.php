@@ -14,6 +14,9 @@ class Column{
     }
 
     public function type(string $type): self {
+        if(str_contains($type, "ENUM")) {
+            $this->column["enum"] = true;
+        }
         $this->column["type"] = $type;
         return $this;
     }

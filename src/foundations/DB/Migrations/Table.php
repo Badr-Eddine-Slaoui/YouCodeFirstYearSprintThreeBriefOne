@@ -2,7 +2,6 @@
 
 namespace Foundations\DB\Migrations;
 
-use DateTime;
 
 class Table
 {
@@ -127,7 +126,7 @@ class Table
 
     public function enum(string $name, array $values): Column {
         $column = new Column($name);
-        $column->type('ENUM(' . implode(',', $values) . ')');
+        $column->type("ENUM('" . implode("','", $values) . "')");
         $this->collumns[] = $column;
         return $column;
     }
