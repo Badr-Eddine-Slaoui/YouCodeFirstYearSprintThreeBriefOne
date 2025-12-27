@@ -30,7 +30,7 @@ class Auth{
         if($providerDriver === "golddigger"){
             $model = $config["providers"][$provider]["model"];
 
-            $user = $model::query()->where(["email" => $email])->first();
+            $user = $model::query()->where("email", "=", $email)->first();
 
             if(empty($user)){
                 return false;
