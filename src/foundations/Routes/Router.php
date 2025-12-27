@@ -142,7 +142,9 @@ class Router {
                     if($isModel){
                         if((int) $requestPathArr[$key] !== 0){
                             $model = $this->isModel($index, $route);
-                            $params[$this->modelParamName] = $model::findOrFail((int) $requestPathArr[$key]);
+                            $params[$this->modelParamName] = function () use ($requestPathArr, $model, $key) {
+                                return $model::findOrFail((int) $requestPathArr[$key]);
+                            };
                             $this->modelParamName = null;
                             continue;
                         }
@@ -158,8 +160,11 @@ class Router {
                 $isFormRequest = $this->isFormRequest($index, $route);
                 if($isFormRequest){
                     $requestForm = $this->isFormRequest($index, $route);
-                    $params[$this->requestFormParamName] = new $requestForm();
-                    $params[$this->requestFormParamName]->handleValidationErrors();
+                    $params[$this->requestFormParamName] = function () use ($requestForm) {
+                        $request = new $requestForm();
+                        $request->handleValidationErrors();
+                        return $request;
+                    };
                     $this->requestFormParamName = null;
                     continue;
                 }
@@ -168,7 +173,13 @@ class Router {
 
         global $container;
 
-        $container->call([$controller, $action], $params);
+        foreach($route["middleware"] as $middleware){
+            Kernel::setMiddleware($middleware);
+        }
+
+        Kernel::handle(new Request(), function() use ($container, $controller, $action, $params) {
+            $container->call([$controller, $action], $params);
+        });
 
         return true;
     }
@@ -183,21 +194,7 @@ class Router {
             array_shift($pathArr);
             array_shift($requestPathArr);
 
-            if (count($pathArr) !== count($requestPathArr) || $requestMethod !== $route['method']) {
-                continue;
-            }
-
-            foreach($route["middleware"] as $middleware){
-                Kernel::setMiddleware($middleware);
-            }
-
-            $isMatched = false;
-
-            Kernel::handle(new Request(), function() use ($requestPathArr, $pathArr, $route, &$isMatched) {
-                $isMatched = $this->match($requestPathArr, $pathArr, $route);
-            });
-
-            if (!$isMatched) {
+            if (count($pathArr) !== count($requestPathArr) || $requestMethod !== $route['method'] || !$this->match($requestPathArr, $pathArr, $route)) {
                 continue;
             }
 

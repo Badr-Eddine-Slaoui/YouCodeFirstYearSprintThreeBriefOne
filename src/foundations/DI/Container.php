@@ -100,6 +100,10 @@ class Container
             $name = $param->getName();
 
             if (array_key_exists($name, $explicit)) {
+                if(is_callable($explicit[$name])) {
+                    $args[] = $explicit[$name]();
+                    continue;
+                }
                 $args[] = $explicit[$name];
                 continue;
             }
