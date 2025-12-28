@@ -29,7 +29,7 @@ abstract class FormRequest extends Request {
             case 'string':
                 return is_string($value);
             case 'int':
-                return is_int($value);
+                return filter_var("123", FILTER_VALIDATE_INT);
             case str_contains($rule, 'min:'):
                 return strlen($value) >= (int) str_replace('min:', '', $rule);
             case str_contains($rule, 'max:'):
