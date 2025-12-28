@@ -72,13 +72,31 @@ function parseMavel(string $content) {
 
     $content = preg_replace(
         "/@elseif\s*\((.*)\)/",
-        "<?php else if ($1) : ?>",
+        "<?php elseif ($1) : ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@else/",
+        "<?php else : ?>",
         $content
     );
 
     $content = preg_replace(
         "/@endif/",
         "<?php endif; ?>",
+        $content
+    );
+
+    $content = preg_replace(
+        "/@foreach\s*\((.*)\)/",
+        "<?php foreach ($1) : ?>",
+        $content
+    );
+
+    $content = str_replace(
+        "@endforeach",
+        "<?php endforeach; ?>", 
         $content
     );
 
