@@ -213,7 +213,7 @@ class QueryBuilder{
             if(is_array($this->toUpdate)){
                 if(count($this->toUpdate) > 0){
                     $sql = $this->grammar()->update($this->table, $this->toUpdate, $this->wheres, $this->orWheres);
-                    $this->executeAll($sql, array_values(array_merge($this->toUpdate, $this->wheres, $this->orWheres)));
+                    $this->executeAll($sql, array_values(array_merge($this->toUpdate, $this->flaten($this->wheres), $this->flaten($this->orWheres))));
                 }
             }
         }
@@ -224,7 +224,7 @@ class QueryBuilder{
         if(isset($this->toDelete)){
             if($this->toDelete){
                 $sql = $this->grammar()->delete($this->table, $this->wheres, $this->orWheres);
-                $this->executeAll($sql, array_values(array_merge($this->wheres, $this->orWheres)));
+                $this->executeAll($sql, array_values(array_merge($this->flaten($this->wheres), $this->flaten($this->orWheres))));
             }
         }
 

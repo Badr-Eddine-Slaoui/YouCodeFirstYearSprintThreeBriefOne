@@ -13,9 +13,12 @@ class Model{
 
     public array $relationships = [];
 
+    private static array $instances = [];
+
     public function __construct(array $attributes = [])
     {
         $this->fill($attributes);
+        self::$instances[] = $this;
     }
 
     public static function class_basename(string $class): string
@@ -107,18 +110,34 @@ class Model{
         return $model;
     }
 
-    public static function update(array $wheres, array $attributes){
+    public static function update(array $attributes, ?array $wheres = null){
         $query = static::query()->update($attributes);
-        foreach ($wheres as $key => $value) {
-            $query->where($key, "=", $value);
+        if($wheres){
+            foreach ($wheres as $key => $value) {
+                $query->where($key, "=", $value);
+            }
+        }else{
+            if(isset(end(self::$instances)->attributes['id'])){
+                $query->where("id",'=', end(self::$instances)->id);
+            }else{
+                if(isset($attributes['id'])){
+                    $query->where('id','=', $attributes['id']);
+                }
+            }
         }
         return $query->get();
     }
 
-    public static function delete(array $wheres){
-        $query = static::query();
-        foreach ($wheres as $key => $value) {
-            $query->where($key, "=", $value);
+    public static function delete(?array $wheres = null){
+        $query = static::query()->delete();
+        if($wheres){
+            foreach ($wheres as $key => $value) {
+                $query->where($key, "=", $value);
+            }
+        }else{
+            if(isset(end(self::$instances)->attributes['id'])) {
+                $query->where("id",'=', end(self::$instances)->id);
+            }
         }
         return $query->get();
     }
