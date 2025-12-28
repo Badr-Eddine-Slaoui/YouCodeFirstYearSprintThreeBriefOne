@@ -29,13 +29,22 @@ abstract class FormRequest extends Request {
             case 'string':
                 return is_string($value);
             case 'int':
-                return filter_var("123", FILTER_VALIDATE_INT);
+                return filter_var($value, FILTER_VALIDATE_INT);
             case str_contains($rule, 'min:'):
+                if(filter_var($value, FILTER_VALIDATE_INT)) {
+                    return (int) $value <= (int) str_replace('min:', '', $rule);
+                }
                 return strlen($value) >= (int) str_replace('min:', '', $rule);
             case str_contains($rule, 'max:'):
+                if(filter_var($value, FILTER_VALIDATE_INT)) {
+                    return (int) $value <= (int) str_replace('max:', '', $rule);
+                }
                 return strlen($value) <= (int) str_replace('max:', '', $rule);
             case str_contains($rule, "between:"):
                 $range = explode(',', str_replace('between:', '', $rule));
+                if(filter_var($value, FILTER_VALIDATE_INT)) {
+                    return (int) $value >= (int) $range[0] && (int) $value <= (int) $range[1];
+                };
                 return strlen($value) >= (int) $range[0] && strlen($value) <= (int) $range[1];
             case str_contains($rule,'in:'):
                 $enum = explode(',', str_replace('in:', '', $rule));
