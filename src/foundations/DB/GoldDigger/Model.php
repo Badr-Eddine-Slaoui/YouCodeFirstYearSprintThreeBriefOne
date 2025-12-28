@@ -53,6 +53,7 @@ class Model{
 
     public function __get(string $key)
     {
+        $key = strtolower($key);
         if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
         }
@@ -71,6 +72,7 @@ class Model{
 
     public function __set(string $key, $value): void
     {
+        $key = strtolower($key);
         $this->attributes[$key] = $value;
     }
 
