@@ -2,10 +2,12 @@
 
 namespace Foundations\DB\GoldDigger;
 
+use BadMethodCallException;
 use Foundations\DB\GoldDigger\Relationships\BelongsTo;
 use Foundations\DB\GoldDigger\Relationships\BelongsToMany;
 use Foundations\DB\GoldDigger\Relationships\HasMany;
 use Foundations\DB\GoldDigger\Relationships\HasOne;
+use InvalidArgumentException;
 
 class Model{
     protected static ?string $table = null;
@@ -13,12 +15,9 @@ class Model{
 
     public array $relationships = [];
 
-    private static array $instances = [];
-
     public function __construct(array $attributes = [])
     {
         $this->fill($attributes);
-        self::$instances[] = $this;
     }
 
     public static function class_basename(string $class): string
@@ -83,6 +82,34 @@ class Model{
             $this->relationships ?: []
         );
     }
+
+    public static function __callStatic(string $method, array $args)
+    {
+        if ($method === 'update') {
+            return static::handleStaticUpdate($args);
+        }
+
+        if ($method === 'delete') {
+            return static::handleStaticDelete($args);
+        }
+
+        throw new BadMethodCallException("Method {$method} does not exist.");
+    }
+
+
+
+    public function __call(string $method, array $args)
+    {
+        if ($method === 'update') {
+            return $this->instantUpdate(...$args);
+        }
+
+        if ($method === 'delete') {
+            return $this->instantDelete(...$args);
+        }
+
+        throw new BadMethodCallException("Method {$method} does not exist.");
+    }
     
     public function load(string $key): self
     {
@@ -112,34 +139,72 @@ class Model{
         return $model;
     }
 
-    public static function update(array $attributes, ?array $wheres = null){
-        $query = static::query()->update($attributes);
+    public function instantUpdate(array $attributes, ?array $wheres = null){
         if($wheres){
-            foreach ($wheres as $key => $value) {
-                $query->where($key, "=", $value);
-            }
+            return static::staticUpdate($attributes, $wheres);
         }else{
-            if(isset(end(self::$instances)->attributes['id'])){
-                $query->where("id",'=', end(self::$instances)->id);
+            $id = null;
+            if(isset($this->attributes['id'])){
+                $id = $this->attributes['id'];
             }else{
                 if(isset($attributes['id'])){
-                    $query->where('id','=', $attributes['id']);
+                    $id = $attributes['id'];
                 }
             }
+            return static::staticUpdate($attributes, ['id'=> $id]);
+        }
+    }
+
+    protected static function handleStaticUpdate(array $args)
+    {
+        if (count($args) !== 2) {
+            throw new InvalidArgumentException(
+                'Static update expects (attributes, wheres)'
+            );
+        }
+
+        [$attributes, $wheres] = $args;
+
+        return static::staticUpdate($attributes, $wheres);
+    }
+
+    protected static function staticUpdate(array $attributes, array $wheres){
+        $query = static::query()->update($attributes);
+        foreach ($wheres as $key => $value) {
+            $query->where($key, "=", $value);
         }
         return $query->get();
     }
 
-    public static function delete(?array $wheres = null){
-        $query = static::query()->delete();
+    public function instantDelete(?array $wheres = null){
         if($wheres){
-            foreach ($wheres as $key => $value) {
-                $query->where($key, "=", $value);
-            }
+            return static::staticDelete($wheres);
         }else{
-            if(isset(end(self::$instances)->attributes['id'])) {
-                $query->where("id",'=', end(self::$instances)->id);
+            $id = null;
+            if(isset($this->attributes['id'])){
+                $id = $this->attributes['id'];
             }
+            return static::staticDelete(['id'=> $id]);
+        }
+    }
+
+    protected static function handleStaticDelete(array $args)
+    {
+        if (count($args) !== 1) {
+            throw new InvalidArgumentException(
+                'Static delete expects (wheres)'
+            );
+        }
+
+        [$wheres] = $args;
+
+        return static::staticDelete($wheres);
+    }
+
+    public static function staticDelete(array $wheres){
+        $query = static::query()->delete();
+        foreach ($wheres as $key => $value) {
+            $query->where($key, "=", $value);
         }
         return $query->get();
     }
