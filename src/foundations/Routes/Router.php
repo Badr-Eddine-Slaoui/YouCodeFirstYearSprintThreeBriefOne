@@ -63,7 +63,7 @@ class Router {
         if ($count > $index) {
             $param  =  $method->getParameters()[$index];
 
-            while($param->getType()->getName() === Request::class || is_subclass_of($param->getType()->getName(), Request::class) && $index < $count - 1){
+            while($param->getType()->getName() === Request::class || is_subclass_of($param->getType()->getName(), Request::class) && $index < $count ){
                 $param  =  $method->getParameters()[$index++];
             }
 
@@ -84,7 +84,7 @@ class Router {
         if($count > $index){
             $param  =  $method->getParameters()[$index];
 
-            while($param->getType()->getName() !== FormRequest::class && !is_subclass_of($param->getType()->getName(), FormRequest::class) && $index < $count - 1){
+            while($param->getType()->getName() !== FormRequest::class && !is_subclass_of($param->getType()->getName(), FormRequest::class) && $index < $count){
                 $param  =  $method->getParameters()[$index++];
             }
 
